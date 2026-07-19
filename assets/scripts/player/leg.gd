@@ -1,27 +1,28 @@
-extends Node3D
+class_name ArachnorbFoot extends SkeletonModifier3D
 
-@export var leg_target: Node3D
-@export var skeleton: Skeleton3D
-var foot: int = 0
-
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	foot = skeleton.find_bone("Foot")
+func _process_modification() -> void:
+	var skeleton: Skeleton3D = get_skeleton()
+	if not skeleton:
+		return
+		
+	var bone_idx: int = skeleton.find_bone("Foot")
+	if bone_idx == -1:
+		return
+		
+	var parent_idx: int = skeleton.get_bone_parent(bone_idx)
+	if parent_idx == -1:
+		return
+		
+	# 1. Grab the current global pose of the parent chain
+	var parent_global_pose: Transform3D = skeleton.get_bone_global_pose(parent_idx)
 	
-	pass # Replace with function body.
-
-func reset_foot():
-	var parent_bone = skeleton.get_bone_parent(foot)
-	var parent_global_pose = skeleton.get_bone_global_pose(parent_bone)
-	var target = Quaternion(Vector3.RIGHT, PI)
-	var local_rotation = parent_global_pose.basis.get_rotation_quaternion().inverse() * target
-	skeleton.set_bone_pose_rotation(foot, local_rotation)
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	reset_foot()
-	pass
-
-func _physics_process(delta: float) -> void:
+	# 2. Define your desired target orientation in global space. 
+	# Since Y- points UP along the bone length, flip it 180 degrees (PI) around X.
+	var target_global_rot := Quaternion(Vector3.RIGHT, PI)
 	
-	pass
+	# 3. Completely strip out the parent's current frame rotation by multiplying by its inverse.
+	# This converts your absolute target rotation into the correct local space.
+	var final_local_rot: Quaternion = parent_global_pose.basis.get_rotation_quaternion().inverse() * target_global_rot
+	
+	# 4. Enforce the rotation directly
+	skeleton.set_bone_pose_rotation(bone_idx, final_local_rot.normalized())

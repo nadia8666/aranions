@@ -13,13 +13,10 @@ angle = 2.2724187
 
 [sub_resource type="JointLimitationCone3D" id="JointLimitationCone3D_kaybx"]
 
-[node name="Leg" unique_id=1078051081 node_paths=PackedStringArray("leg_target", "skeleton") instance=ExtResource("1_kaybx")]
-script = ExtResource("2_ekfm5")
-leg_target = NodePath("LegTarget")
-skeleton = NodePath("LegArmature/Skeleton3D")
+[node name="Leg" unique_id=1078051081 instance=ExtResource("1_kaybx")]
 
 [node name="LegTarget" type="Node3D" parent="." index="0" unique_id=1671586966]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.845852, -0.6438103, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.4388657, 4.750846, 0)
 
 [node name="Leg" parent="LegArmature/Skeleton3D" parent_id_path=PackedInt32Array(318013985) index="0" unique_id=1127519907]
 material_override = SubResource("StandardMaterial3D_mr7gh")
@@ -48,3 +45,23 @@ settings/0/joints/2/limitation/right_axis = 0
 settings/0/joints/2/limitation/rotation_offset = Quaternion(-1, 0, 0, 1)
 settings/0/joints/3/rotation_axis = 0
 settings/0/joints/3/limitation = null
+
+[node name="ArachnorbFoot" type="SkeletonModifier3D" parent="LegArmature/Skeleton3D" parent_id_path=PackedInt32Array(318013985) index="2" unique_id=289468122]
+unique_name_in_owner = false
+process_mode = 0
+process_priority = 0
+process_physics_priority = 0
+process_thread_group = 0
+physics_interpolation_mode = 0
+auto_translate_mode = 0
+editor_description = ""
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+rotation_edit_mode = 0
+rotation_order = 2
+top_level = false
+visible = true
+visibility_parent = NodePath("")
+active = true
+influence = 1.0
+script = ExtResource("2_ekfm5")
+metadata/_custom_type_script = "uid://rn6oo70uajnb"

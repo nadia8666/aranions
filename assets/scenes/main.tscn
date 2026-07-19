@@ -2,18 +2,45 @@
 
 [ext_resource type="PackedScene" uid="uid://bk1i3qevelj6e" path="res://assets/scenes/arachnorb_player.tscn" id="1_g3k4f"]
 
+[sub_resource type="Environment" id="Environment_mr7gh"]
+background_mode = 1
+background_color = Color(0.48570347, 0.48570353, 0.48570347, 1)
+ssao_enabled = true
+fog_enabled = true
+
+[sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_lm8ba"]
+
+[sub_resource type="Compositor" id="Compositor_3s3ph"]
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mr7gh"]
 albedo_color = Color(0.39098924, 0, 0.108241804, 1)
 
 [node name="Node3D" type="Node3D" unique_id=1338169532]
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=2201421]
-transform = Transform3D(1, 0, 0, 0, 0.9755476, 0.21978821, 0, -0.21978821, 0.9755476, 3.5891469, 11.60799, 4.3903503)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.9406452, 13.891896, 9.720023)
+environment = SubResource("Environment_mr7gh")
+attributes = SubResource("CameraAttributesPractical_lm8ba")
+compositor = SubResource("Compositor_3s3ph")
+current = true
 
 [node name="CSGBox3D" type="CSGBox3D" parent="." unique_id=1844641927]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 0.9091797)
-size = Vector3(49.041016, 1, 22.685547)
+size = Vector3(100.06836, 1, 82.11035)
 material = SubResource("StandardMaterial3D_mr7gh")
 
-[node name="ArachnorbPlayer" parent="." unique_id=1133020816 instance=ExtResource("1_g3k4f")]
+[node name="ArachnorbPlayer" parent="." unique_id=1133020816 node_paths=PackedStringArray("camera", "leg_template") instance=ExtResource("1_g3k4f")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9.166677, 0)
+camera = NodePath("../Camera3D")
+leg_template = NodePath("Leg")
+
+[node name="LegTarget" parent="ArachnorbPlayer/Leg" parent_id_path=PackedInt32Array(1133020816, 1078051081) index="0" unique_id=1671586966]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.8295393, -3.6846046, 9.536743e-07)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1062351522]
+transform = Transform3D(-0.094506525, -0.84443736, 0.5272514, -0.14898571, 0.5356543, 0.8311905, -0.98431283, 0, -0.17643194, 0, 0, 0)
+light_energy = 1.85
+
+[editable path="ArachnorbPlayer"]
+[editable path="ArachnorbPlayer/Leg"]
+[editable path="ArachnorbPlayer/Body"]
