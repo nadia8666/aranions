@@ -17,10 +17,11 @@ extends Node3D
 
 # step config
 @export var step_radius := 6.0
-@export var step_height := 2.0
+@export var step_height := 3.0
 @export var step_length := 4.0
+@export var step_length_run := 6.0
 var step_timer := 0.0
-var step_duration := .35
+var step_duration := 0.75
 var is_stepping := false
 var current_leg := 0
 
@@ -116,7 +117,7 @@ func step_legs(delta: float):
 		var ideal_foot = body.global_position + (outward_dir * step_radius)
 		
 		if move_direction.length_squared() > 0.0:
-			ideal_foot += walk_dir * step_length
+			ideal_foot += walk_dir * (step_length_run if Input.is_action_pressed("run") else step_length)
 			
 		target_foot_pos = get_ground_pos(ideal_foot)
 
