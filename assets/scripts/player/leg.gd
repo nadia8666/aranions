@@ -1,5 +1,7 @@
 class_name ArachnorbFoot extends SkeletonModifier3D
 
+# this is: completely ai generated
+
 func _process_modification() -> void:
 	var skeleton: Skeleton3D = get_skeleton()
 	if not skeleton:
