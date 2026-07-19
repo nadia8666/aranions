@@ -28,7 +28,7 @@ albedo_color = Color(0.39098924, 0, 0.108241804, 1)
 [node name="Node3D" type="Node3D" unique_id=1338169532]
 
 [node name="PhantomCamera3D" type="Node3D" parent="." unique_id=1497589868 node_paths=PackedStringArray("follow_target")]
-transform = Transform3D(-1, 0, 0, 0, 0.9659258, 0.25881907, 0, 0.25881907, -0.96592593, -1.185, 14.861019, -22.775368)
+transform = Transform3D(0, 0.25881907, -0.9659258, 0, 0.9659258, 0.25881907, 1, 0, 0, -22.435368, 12.252473, -1.525)
 script = ExtResource("1_sfrgt")
 follow_mode = 6
 follow_target = NodePath("../ArachnorbPlayer")
@@ -45,7 +45,7 @@ align_rotation_with_view = Callable()
 metadata/_custom_type_script = "uid://csjccrhj5wnx7"
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=2201421 node_paths=PackedStringArray("phantom_camera")]
-transform = Transform3D(-1, 0, 0, 0, 0.9659258, 0.25881907, 0, 0.25881907, -0.96592593, -1.185, 14.861019, -22.775368)
+transform = Transform3D(0, 0.25881907, -0.9659258, 0, 0.9659258, 0.25881907, 1, 0, 0, -22.435368, 12.252473, -1.525)
 top_level = true
 environment = SubResource("Environment_mr7gh")
 attributes = SubResource("CameraAttributesPractical_lm8ba")
@@ -62,17 +62,28 @@ metadata/_custom_type_script = "uid://bd046eokvcnu2"
 
 [node name="CSGBox3D" type="CSGBox3D" parent="." unique_id=1844641927]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 0.9091797)
+use_collision = true
 size = Vector3(100.06836, 1, 82.11035)
 material = SubResource("StandardMaterial3D_mr7gh")
 
-[node name="ArachnorbPlayer" parent="." unique_id=1133020816 node_paths=PackedStringArray("camera", "leg_template", "body") instance=ExtResource("1_g3k4f")]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -1.185, 9.167, -1.525)
+[node name="CSGBox3D2" type="CSGBox3D" parent="." unique_id=639400732]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, -2.2038574, -14.568575)
+use_collision = true
+size = Vector3(100.06836, 9.062988, 14.055664)
+material = SubResource("StandardMaterial3D_mr7gh")
+
+[node name="ArachnorbPlayer" parent="." unique_id=1133020816 node_paths=PackedStringArray("camera", "body", "leg_template") instance=ExtResource("1_g3k4f")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.185, 6.5584536, -1.525)
 camera = NodePath("../Camera3D")
-leg_template = NodePath("Leg")
 body = NodePath("Body")
 body_height = 3.0
+leg_template = NodePath("Leg")
 
-[node name="LegTarget" parent="ArachnorbPlayer/Leg" parent_id_path=PackedInt32Array(1133020816, 1078051081) index="0" unique_id=1671586966]
+[node name="Leg" parent="ArachnorbPlayer" index="0" unique_id=1078051081]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.185, 6.5584536, -1.525)
+top_level = true
+
+[node name="LegTarget" parent="ArachnorbPlayer/Leg" index="0" unique_id=1671586966]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.8295393, -3.6846046, 9.536743e-07)
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1062351522]

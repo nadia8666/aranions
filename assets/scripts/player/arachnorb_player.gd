@@ -2,31 +2,57 @@ extends Node3D
 
 # arachnorb controller
 # my awesome philosiphy:
-#	legs move one at a time, in a pattern where one moves, the opposite moves, then it cycles to the next pair
-#	the root object's position is linked to the body pos
-#	body position is dependent on the 4 feet, and never rotates
-#	invidiaul legs rotate to face their target position, and reposition foot on their leg plane (LOCAL X & Y, Z = 0)
-#	target rotation dictates the goal rotation but the arachnorb itself never actually rotates, they are purposefully decoupled from eachother
+# 	legs move one at a time, in a pattern where one moves, the opposite moves, then it cycles to the next pair
+# 	the root object's position is linked to the body pos
+# 	body position is dependent on the 4 feet, and never rotates
+# 	invidiaul legs rotate to face their target position, and reposition foot on their leg plane (LOCAL X & Y, Z = 0)
+# 	target rotation dictates the goal rotation but the arachnorb itself never actually rotates, they are purposefully decoupled from eachother
 
-# variables
+# misc
 @export var camera: Camera3D
-@export var leg_count: int = 4
-@export var leg_template: Node3D
+
+# body config
 @export var body: Node3D
 @export var body_height := 5.0
 
+# step config
+@export var step_radius := 6.0
+@export var step_height := 2.0
+@export var step_length := 4.0
+var step_timer := 0.0
+var step_duration := .35
+var is_stepping := false
+var current_leg := 0
+
+# foot config
+@export var foot_offset := .8
+
+# leg config
+@export var leg_count: int = 4
+@export var leg_template: Node3D
 var legs: Array[Node3D] = []
 var leg_targets: Array[Node3D] = []
 var leg_offsets: Array[float] = []
 
-var step_timer := 0.0
-var step_duration := 1
-var is_stepping := false
-var current_leg := 0
-
+# movement
 var target_rotation: Quaternion
+var move_direction := Vector3.ZERO
+
+# step cache
+var start_leg_rot: Quaternion
+var target_leg_rot: Quaternion
+var start_foot_pos: Vector3
+var target_foot_pos: Vector3
 
 # functions
+func get_ground_pos(target: Vector3) -> Vector3:
+	var space = get_world_3d().direct_space_state
+	var ray = PhysicsRayQueryParameters3D.create(target + Vector3(0, body_height * 3, 0), target - Vector3(0, body_height * 6.0, 0))
+	var hit = space.intersect_ray(ray)
+	if hit:
+		return hit.position + Vector3(0, foot_offset, 0)
+	return target - Vector3(0, body_height, 0) + Vector3(0, foot_offset, 0)
+
 func create_legs():
 	for index in range(leg_count):
 		var angle = fposmod(((TAU / leg_count) * index) + (PI / 4.0), TAU)
@@ -37,7 +63,14 @@ func create_legs():
 		add_child(leg)
 		legs.append(leg)
 		leg_offsets.append(angle)
-		leg_targets.append(leg.find_child("LegTarget"))
+		
+		var target = leg.find_child("LegTarget")
+		target.top_level = true
+		leg_targets.append(target)
+		
+		var outward = Quaternion(Vector3.UP, angle) * Vector3.RIGHT
+		var ideal_foot = self.global_position + (outward * step_radius)
+		target.global_position = get_ground_pos(ideal_foot)
 		
 	remove_child(leg_template)
 
@@ -46,28 +79,57 @@ func rotate_to_input():
 	var dir = Input.get_vector("move_left", "move_right", "move_down", "move_up", 0.1)
 	
 	if dir.length() > 0:
-		var move = (Quaternion(Vector3.UP, atan2(dir.x, -dir.y)) * (camera.quaternion * Vector3.FORWARD).slide(Vector3.UP)).normalized().slide(Vector3.UP)
-		var turn = (self.quaternion * Vector3.FORWARD).signed_angle_to(move, Vector3.UP)
+		move_direction = (Quaternion(Vector3.UP, atan2(-dir.x, dir.y)) * (camera.quaternion * Vector3.FORWARD).slide(Vector3.UP)).normalized().slide(Vector3.UP)
+		var turn = (self.quaternion * Vector3.FORWARD).signed_angle_to(move_direction, Vector3.UP)
 		target_rotation = self.quaternion * Quaternion(Vector3.UP, turn)
 
 		if not is_stepping:
 			is_stepping = true
+	else:
+		move_direction = Vector3.ZERO
 
 # rotates and steps the current focused leg
 func step_legs(delta: float):
-	# move leg
-	if is_stepping:
-		step_timer += delta
-
-		var leg = legs[current_leg]
-		var offset = leg_offsets[current_leg]
-		var foot = leg_targets[current_leg]
-
-		var target_rot = (target_rotation * Quaternion(Vector3.UP, offset)).normalized()
-		leg.quaternion = leg.quaternion.slerp(target_rot, delta * 5)
-		# TODO: step and reposition foot
+	if not is_stepping:
+		return
 		
-	# reset legs
+	var leg = legs[current_leg]
+	var offset = leg_offsets[current_leg]
+	var foot = leg_targets[current_leg]
+
+	# calculate targets
+	if step_timer == 0.0:
+		start_leg_rot = leg.quaternion
+		start_foot_pos = foot.global_position
+
+		var ideal_rot = (target_rotation * Quaternion(Vector3.UP, offset)).normalized()
+		var angle_diff = start_leg_rot.angle_to(ideal_rot)
+		var max_angle = PI / 4.0
+		
+		if angle_diff > max_angle:
+			target_leg_rot = start_leg_rot.slerp(ideal_rot, max_angle / angle_diff)
+		else:
+			target_leg_rot = ideal_rot
+
+		var outward_dir = target_leg_rot * Vector3.RIGHT
+		var walk_dir = target_rotation * Vector3.FORWARD
+		var ideal_foot = body.global_position + (outward_dir * step_radius)
+		
+		if move_direction.length_squared() > 0.0:
+			ideal_foot += walk_dir * step_length
+			
+		target_foot_pos = get_ground_pos(ideal_foot)
+
+	step_timer += delta
+	var alpha = clamp(step_timer / step_duration, 0.0, 1.0)
+
+	leg.quaternion = start_leg_rot.slerp(target_leg_rot, alpha)
+
+	var current_foot_pos = start_foot_pos.lerp(target_foot_pos, alpha)
+	current_foot_pos.y += sin(alpha * PI) * step_height
+	foot.global_position = current_foot_pos
+		
+	# advance cycle
 	if step_timer >= step_duration:
 		is_stepping = false
 		step_timer = 0.0
@@ -81,24 +143,29 @@ func step_legs(delta: float):
 # centers the body between all 4 feet
 func position_body():
 	var average_pos = Vector3.ZERO
-
-	var feet_positions: Array[Vector3] = []
+	
 	for foot in leg_targets:
-		average_pos += foot.global_position;
-		feet_positions.append(foot.global_position)
+		average_pos += foot.global_position
 	
 	average_pos /= leg_count
 	average_pos += Vector3(0, body_height, 0)
 
+	self.global_position = average_pos
 	body.global_position = average_pos
-
-	for leg in legs:
-		leg.global_position = average_pos
 	
-	var index = 0
-	for foot in leg_targets:
-		foot.global_position = feet_positions[index]
-		index += 1
+	for i in range(legs.size()):
+		var leg = legs[i]
+		var foot = leg_targets[i]
+		
+		leg.global_position = average_pos
+		var dir_to_foot = (foot.global_position - average_pos)
+		dir_to_foot.y = 0
+		
+		if dir_to_foot.length_squared() > 0.001:
+			var target_basis = Basis.looking_at(dir_to_foot.normalized(), Vector3.UP)
+			target_basis = target_basis.rotated(Vector3.UP, PI / 2.0)
+			
+			leg.quaternion = target_basis.get_rotation_quaternion()
 
 # lifecycle events
 func _ready() -> void:
@@ -110,7 +177,7 @@ func _ready() -> void:
 
 	create_legs()
 
-func _process(delta: float) -> void:
+func _physics_process(delta: float) -> void:
 	rotate_to_input()
 	step_legs(delta)
 	position_body()
