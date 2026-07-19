@@ -1,0 +1,5 @@
+[gd_scene format=3 uid="uid://dcncrlmwgen8j"]
+
+[ext_resource type="PackedScene" uid="uid://c4a7uxtj8tgeg" path="res://assets/rig/body.glb" id="1_bsq5x"]
+
+[node name="Body" unique_id=1639314582 instance=ExtResource("1_bsq5x")]

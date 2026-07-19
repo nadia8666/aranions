@@ -1,0 +1,50 @@
+[gd_scene format=3 uid="uid://b1nmutfv0wsra"]
+
+[ext_resource type="PackedScene" uid="uid://byu3rlu7cl4hr" path="res://assets/rig/leg.glb" id="1_kaybx"]
+[ext_resource type="Script" uid="uid://rn6oo70uajnb" path="res://assets/scripts/player/leg.gd" id="2_ekfm5"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mr7gh"]
+albedo_color = Color(0.6415687, 0.58093315, 0.8322149, 1)
+
+[sub_resource type="JointLimitationCone3D" id="JointLimitationCone3D_oci0x"]
+
+[sub_resource type="JointLimitationCone3D" id="JointLimitationCone3D_eruk6"]
+angle = 2.2724187
+
+[sub_resource type="JointLimitationCone3D" id="JointLimitationCone3D_kaybx"]
+
+[node name="Leg" unique_id=1078051081 node_paths=PackedStringArray("leg_target", "skeleton") instance=ExtResource("1_kaybx")]
+script = ExtResource("2_ekfm5")
+leg_target = NodePath("LegTarget")
+skeleton = NodePath("LegArmature/Skeleton3D")
+
+[node name="LegTarget" type="Node3D" parent="." index="0" unique_id=1671586966]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.845852, -0.6438103, 0)
+
+[node name="Leg" parent="LegArmature/Skeleton3D" parent_id_path=PackedInt32Array(318013985) index="0" unique_id=1127519907]
+material_override = SubResource("StandardMaterial3D_mr7gh")
+
+[node name="CCDIK3D" type="CCDIK3D" parent="LegArmature/Skeleton3D" parent_id_path=PackedInt32Array(318013985) index="1" unique_id=1226450874]
+max_iterations = 32
+setting_count = 1
+settings/0/target_node = NodePath("../../../LegTarget")
+settings/0/root_bone_name = "Leg1"
+settings/0/root_bone = 1
+settings/0/end_bone_name = "Foot"
+settings/0/end_bone = 4
+settings/0/extend_end_bone = false
+settings/0/joint_count = 4
+settings/0/joints/0/rotation_axis = 0
+settings/0/joints/0/limitation = SubResource("JointLimitationCone3D_oci0x")
+settings/0/joints/0/limitation/right_axis = 0
+settings/0/joints/0/limitation/rotation_offset = Quaternion(1, 0, 0, 1)
+settings/0/joints/1/rotation_axis = 0
+settings/0/joints/1/limitation = SubResource("JointLimitationCone3D_eruk6")
+settings/0/joints/1/limitation/right_axis = 1
+settings/0/joints/1/limitation/rotation_offset = Quaternion(-1, 0, 0, 1)
+settings/0/joints/2/rotation_axis = 0
+settings/0/joints/2/limitation = SubResource("JointLimitationCone3D_kaybx")
+settings/0/joints/2/limitation/right_axis = 0
+settings/0/joints/2/limitation/rotation_offset = Quaternion(-1, 0, 0, 1)
+settings/0/joints/3/rotation_axis = 0
+settings/0/joints/3/limitation = null

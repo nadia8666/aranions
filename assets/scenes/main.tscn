@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://bw5qgrtnple0k"]
+
+[ext_resource type="PackedScene" uid="uid://bk1i3qevelj6e" path="res://assets/scenes/arachnorb_player.tscn" id="1_g3k4f"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mr7gh"]
+albedo_color = Color(0.39098924, 0, 0.108241804, 1)
+
+[node name="Node3D" type="Node3D" unique_id=1338169532]
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=2201421]
+transform = Transform3D(1, 0, 0, 0, 0.9755476, 0.21978821, 0, -0.21978821, 0.9755476, 3.5891469, 11.60799, 4.3903503)
+
+[node name="CSGBox3D" type="CSGBox3D" parent="." unique_id=1844641927]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 0.9091797)
+size = Vector3(49.041016, 1, 22.685547)
+material = SubResource("StandardMaterial3D_mr7gh")
+
+[node name="ArachnorbPlayer" parent="." unique_id=1133020816 instance=ExtResource("1_g3k4f")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9.166677, 0)
