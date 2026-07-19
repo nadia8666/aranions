@@ -174,7 +174,7 @@ func position_body():
 			leg.quaternion = target_basis.get_rotation_quaternion()
 
 # springs the first joint of the leg to look good on flat ground
-func update_leg_pose_bias(leg_index: int):
+func update_leg_pose(leg_index: int):
 	var leg = legs[leg_index]
 	var foot = leg_targets[leg_index]
 	var skeleton: Skeleton3D = leg.get_node("LegArmature/Skeleton3D")
@@ -197,6 +197,6 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	rotate_to_input()
 	for index in range(leg_count):
-		update_leg_pose_bias(index)
+		update_leg_pose(index)
 	step_legs(delta)
 	position_body()
