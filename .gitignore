@@ -4,4 +4,4 @@
 
 .vscode
 *.code-workspace
-addons/
+export/

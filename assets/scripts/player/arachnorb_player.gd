@@ -22,6 +22,8 @@ extends Node3D
 @export var step_length_run := 6.0
 var step_timer := 0.0
 var step_duration := 0.75
+var step_duration_run := 0.5
+var duration := step_duration
 var is_stepping := false
 var current_leg := 0
 
@@ -85,6 +87,7 @@ func rotate_to_input():
 		target_rotation = self.quaternion * Quaternion(Vector3.UP, turn)
 
 		if not is_stepping:
+			duration = step_duration_run if Input.is_action_pressed("run") else step_duration
 			is_stepping = true
 	else:
 		move_direction = Vector3.ZERO
@@ -121,8 +124,9 @@ func step_legs(delta: float):
 			
 		target_foot_pos = get_ground_pos(ideal_foot)
 
+
 	step_timer += delta
-	var alpha = clamp(step_timer / step_duration, 0.0, 1.0)
+	var alpha = clamp(step_timer / duration, 0.0, 1.0)
 
 	leg.quaternion = start_leg_rot.slerp(target_leg_rot, alpha)
 
@@ -131,7 +135,8 @@ func step_legs(delta: float):
 	foot.global_position = current_foot_pos
 		
 	# advance cycle
-	if step_timer >= step_duration:
+	if step_timer >= duration:
+		duration = step_duration_run if Input.is_action_pressed("run") else step_duration
 		is_stepping = false
 		step_timer = 0.0
 		
@@ -168,6 +173,17 @@ func position_body():
 			
 			leg.quaternion = target_basis.get_rotation_quaternion()
 
+# springs the first joint of the leg to look good on flat ground
+func update_leg_pose_bias(leg_index: int):
+	var leg = legs[leg_index]
+	var foot = leg_targets[leg_index]
+	var skeleton: Skeleton3D = leg.get_node("LegArmature/Skeleton3D")
+	var index = skeleton.find_bone("Leg1")
+	
+	var dist = leg.global_position.distance_to(foot.global_position)
+	var factor = clamp(((dist / (step_radius * 1.85)) - .6) * 2, 0, 1)
+	skeleton.set_bone_pose_rotation(index, Quaternion(0, .7, lerp(.3, .7, factor), 0))
+
 # lifecycle events
 func _ready() -> void:
 	body.top_level = true
@@ -180,5 +196,7 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	rotate_to_input()
+	for index in range(leg_count):
+		update_leg_pose_bias(index)
 	step_legs(delta)
 	position_body()

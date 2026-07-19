@@ -10,10 +10,14 @@ config_version=5
 
 [application]
 
-config/name="live out youre days as an aranas of the huge"
+config/name="arachnorb heaven"
+config/description="live out your days as an arachnorb of the huge!
+big aran's Coming Soon!"
+config/version="0.0.0"
 run/main_scene="uid://bw5qgrtnple0k"
 config/features=PackedStringArray("4.7", "Forward Plus")
-config/icon="res://icon.svg"
+boot_splash/show_image=false
+config/icon="uid://cxabtro6n0fnn"
 
 [autoload]
 
@@ -30,12 +34,16 @@ gdscript/warnings/integer_division=0
 
 [display]
 
+window/size/viewport_width=1920
+window/size/viewport_height=1080
+window/size/mode=3
+window/size/borderless=true
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/phantom_camera/plugin.cfg")
+enabled=PackedStringArray("res://addons/phantom_camera/plugin.cfg", "res://addons/sky_3d/plugin.cfg")
 
 [input]
 
