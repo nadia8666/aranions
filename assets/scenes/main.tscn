@@ -1,6 +1,16 @@
 [gd_scene format=3 uid="uid://bw5qgrtnple0k"]
 
 [ext_resource type="PackedScene" uid="uid://bk1i3qevelj6e" path="res://assets/scenes/arachnorb_player.tscn" id="1_g3k4f"]
+[ext_resource type="Script" uid="uid://csjccrhj5wnx7" path="res://addons/phantom_camera/scripts/phantom_camera/phantom_camera_3d.gd" id="1_sfrgt"]
+[ext_resource type="Script" uid="uid://8umksf8e80fw" path="res://addons/phantom_camera/scripts/resources/tween_resource.gd" id="2_etxf0"]
+[ext_resource type="Script" uid="uid://b60paufaq7e2a" path="res://assets/scripts/camera.gd" id="3_etxf0"]
+[ext_resource type="Script" uid="uid://bd046eokvcnu2" path="res://addons/phantom_camera/scripts/phantom_camera_host/phantom_camera_host.gd" id="3_vesw4"]
+
+[sub_resource type="Resource" id="Resource_xplbd"]
+script = ExtResource("2_etxf0")
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_etxf0"]
+radius = 1.0
 
 [sub_resource type="Environment" id="Environment_mr7gh"]
 background_mode = 1
@@ -17,22 +27,50 @@ albedo_color = Color(0.39098924, 0, 0.108241804, 1)
 
 [node name="Node3D" type="Node3D" unique_id=1338169532]
 
-[node name="Camera3D" type="Camera3D" parent="." unique_id=2201421]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.9406452, 13.891896, 9.720023)
+[node name="PhantomCamera3D" type="Node3D" parent="." unique_id=1497589868 node_paths=PackedStringArray("follow_target")]
+transform = Transform3D(-1, 0, 0, 0, 0.9659258, 0.25881907, 0, 0.25881907, -0.96592593, -1.185, 14.861019, -22.775368)
+script = ExtResource("1_sfrgt")
+follow_mode = 6
+follow_target = NodePath("../ArachnorbPlayer")
+tween_resource = SubResource("Resource_xplbd")
+follow_damping = true
+follow_distance = 22.0
+vertical_rotation_offset = 0.2617993877991494
+horizontal_rotation_offset = 1.5707963267948966
+spring_length = 22.0
+shape = SubResource("SphereShape3D_etxf0")
+align_transform_with_view = Callable()
+align_position_with_view = Callable()
+align_rotation_with_view = Callable()
+metadata/_custom_type_script = "uid://csjccrhj5wnx7"
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=2201421 node_paths=PackedStringArray("phantom_camera")]
+transform = Transform3D(-1, 0, 0, 0, 0.9659258, 0.25881907, 0, 0.25881907, -0.96592593, -1.185, 14.861019, -22.775368)
+top_level = true
 environment = SubResource("Environment_mr7gh")
 attributes = SubResource("CameraAttributesPractical_lm8ba")
 compositor = SubResource("Compositor_3s3ph")
 current = true
+script = ExtResource("3_etxf0")
+phantom_camera = NodePath("../PhantomCamera3D")
+
+[node name="PhantomCameraHost" type="Node" parent="Camera3D" unique_id=1283813981]
+process_priority = 300
+process_physics_priority = 300
+script = ExtResource("3_vesw4")
+metadata/_custom_type_script = "uid://bd046eokvcnu2"
 
 [node name="CSGBox3D" type="CSGBox3D" parent="." unique_id=1844641927]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 0.9091797)
 size = Vector3(100.06836, 1, 82.11035)
 material = SubResource("StandardMaterial3D_mr7gh")
 
-[node name="ArachnorbPlayer" parent="." unique_id=1133020816 node_paths=PackedStringArray("camera", "leg_template") instance=ExtResource("1_g3k4f")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9.166677, 0)
+[node name="ArachnorbPlayer" parent="." unique_id=1133020816 node_paths=PackedStringArray("camera", "leg_template", "body") instance=ExtResource("1_g3k4f")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -1.185, 9.167, -1.525)
 camera = NodePath("../Camera3D")
 leg_template = NodePath("Leg")
+body = NodePath("Body")
+body_height = 3.0
 
 [node name="LegTarget" parent="ArachnorbPlayer/Leg" parent_id_path=PackedInt32Array(1133020816, 1078051081) index="0" unique_id=1671586966]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.8295393, -3.6846046, 9.536743e-07)

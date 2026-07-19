@@ -16,7 +16,7 @@ angle = 2.2724187
 [node name="Leg" unique_id=1078051081 instance=ExtResource("1_kaybx")]
 
 [node name="LegTarget" type="Node3D" parent="." index="0" unique_id=1671586966]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.4388657, 4.750846, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.252214, 0.3660643, 0)
 
 [node name="Leg" parent="LegArmature/Skeleton3D" parent_id_path=PackedInt32Array(318013985) index="0" unique_id=1127519907]
 material_override = SubResource("StandardMaterial3D_mr7gh")
