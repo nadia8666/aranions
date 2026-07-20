@@ -14,7 +14,7 @@ config/name="arachnorb heaven"
 config/description="live out your days as an arachnorb of the huge!
 big aran's Coming Soon!"
 config/version="0.0.0"
-run/main_scene="uid://bw5qgrtnple0k"
+run/main_scene="uid://cy1e12kswkcqf"
 config/features=PackedStringArray("4.7", "Forward Plus")
 boot_splash/show_image=false
 config/icon="uid://cxabtro6n0fnn"
@@ -22,6 +22,7 @@ config/icon="uid://cxabtro6n0fnn"
 [autoload]
 
 PhantomCameraManager="*uid://duq6jhf6unyis"
+NetworkManager="*uid://xlu7ij8ds057"
 
 [debug]
 
@@ -40,6 +41,10 @@ window/size/mode=3
 window/size/borderless=true
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
+
+[editor]
+
+version_control/main_scene="uid://cy1e12kswkcqf"
 
 [editor_plugins]
 

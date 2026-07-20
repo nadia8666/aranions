@@ -1,11 +1,11 @@
 extends Node3D
 
 # arachnorb controller
-# my awesome philosiphy:
+# my awesome philosophy:
 # 	legs move one at a time, in a pattern where one moves, the opposite moves, then it cycles to the next pair
 # 	the root object's position is linked to the body pos
 # 	body position is dependent on the 4 feet, and never rotates
-# 	invidiaul legs rotate to face their target position, and reposition foot on their leg plane (LOCAL X & Y, Z = 0)
+# 	individual legs rotate to face their target position, and reposition foot on their leg plane (LOCAL X & Y, Z = 0)
 # 	target rotation dictates the goal rotation but the arachnorb itself never actually rotates, they are purposefully decoupled from eachother
 
 # misc
@@ -21,8 +21,8 @@ extends Node3D
 @export var step_length := 4.0
 @export var step_length_run := 6.0
 var step_timer := 0.0
-var step_duration := 0.75
-var step_duration_run := 0.5
+const step_duration := 0.75
+const step_duration_run := 0.5
 var duration := step_duration
 var is_stepping := false
 var current_leg := 0
@@ -46,6 +46,10 @@ var start_leg_rot: Quaternion
 var target_leg_rot: Quaternion
 var start_foot_pos: Vector3
 var target_foot_pos: Vector3
+
+# network
+var network_tick_timer := 0.0
+const network_tick_rate := 0.033
 
 # functions
 func get_ground_pos(target: Vector3) -> Vector3:
@@ -79,6 +83,9 @@ func create_legs():
 
 # calculates movement direction and sets target rotation accordingly
 func rotate_to_input():
+	if not camera:
+		return
+	
 	var dir = Input.get_vector("move_left", "move_right", "move_down", "move_up", 0.1)
 	
 	if dir.length() > 0:
@@ -184,19 +191,61 @@ func update_leg_pose(leg_index: int):
 	var factor = clamp(((dist / (step_radius * 1.85)) - .6) * 2, 0, 1)
 	skeleton.set_bone_pose_rotation(index, Quaternion(0, .7, lerp(.3, .7, factor), 0))
 
+# replicates leg positions
+func _send_leg_positions() -> void:
+	var positions := PackedVector3Array()
+	positions.resize(leg_targets.size())
+	
+	for index in range(leg_targets.size()):
+		positions[index] = leg_targets[index].global_position
+		
+	rpc_id(0, "sync_leg_targets", positions)
+
+# update leg targets
+@rpc("any_peer", "call_remote", "unreliable")
+func sync_leg_targets(positions: PackedVector3Array) -> void:
+	if is_multiplayer_authority():
+		return
+		
+	# TODO: might not be needed?
+	var max_index: int = min(positions.size(), leg_targets.size())
+	for index in range(max_index):
+		leg_targets[index].global_position = positions[index]
+
 # lifecycle events
 func _ready() -> void:
+	var peer = str(name).to_int()
+	if peer != 0:
+		set_multiplayer_authority(peer)
+	
+	if is_multiplayer_authority():
+		if not camera:
+			camera = get_viewport().get_camera_3d()
+		if camera:
+			camera.current = true
+	
+	self.global_position = Vector3(0, 222.865, 0)
+	
 	body.top_level = true
 	target_rotation = self.quaternion
 	if leg_count % 2 != 0:
 		push_error("[FATAL]: arachnorb player with invalid leg count of %s" % [leg_count])
 		return
-
+	
 	create_legs()
 
 func _physics_process(delta: float) -> void:
-	rotate_to_input()
+	if is_multiplayer_authority():
+		rotate_to_input()
+		step_legs(delta)
+		
+		# handle network ticks
+		network_tick_timer += delta
+		if network_tick_timer >= network_tick_rate:
+			network_tick_timer = 0.0
+			_send_leg_positions()
+	
 	for index in range(leg_count):
 		update_leg_pose(index)
-	step_legs(delta)
+	
 	position_body()

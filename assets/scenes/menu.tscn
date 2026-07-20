@@ -1,0 +1,98 @@
+[gd_scene format=3 uid="uid://cy1e12kswkcqf"]
+
+[ext_resource type="Script" uid="uid://de2c4r7cuukge" path="res://assets/scripts/networking/menu.gd" id="1_8omcj"]
+
+[node name="Menu" type="Control" unique_id=2009474845]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_8omcj")
+player_scene = null
+
+[node name="Title" type="Label" parent="." unique_id=12199990]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -483.5
+offset_right = 483.5
+offset_bottom = 289.0
+grow_horizontal = 2
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 90
+text = "arachnorb heaven
+"
+horizontal_alignment = 1
+
+[node name="Singleplayer" type="Button" parent="." unique_id=623203793]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.1078125
+anchor_top = 0.22314815
+anchor_right = 0.31197917
+anchor_bottom = 0.3675926
+theme_override_font_sizes/font_size = 60
+text = "singleplayer"
+metadata/_edit_use_anchors_ = true
+
+[node name="MultiHost" type="Button" parent="." unique_id=1729185928]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.108
+anchor_top = 0.39400002
+anchor_right = 0.379
+anchor_bottom = 0.53900003
+offset_left = -0.3600006
+offset_top = 0.47998047
+offset_right = -128.68
+offset_bottom = -0.12005615
+theme_override_font_sizes/font_size = 60
+text = "multiplayer - host
+"
+metadata/_edit_use_anchors_ = true
+
+[node name="MultiJoin" type="Button" parent="." unique_id=1743973359]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.108
+anchor_top = 0.563
+anchor_right = 0.36900002
+anchor_bottom = 0.707
+offset_left = -0.3600006
+offset_top = -0.040039063
+offset_right = -109.48004
+offset_bottom = 0.44000244
+theme_override_font_sizes/font_size = 60
+text = "multiplayer - join
+"
+
+[node name="MultiJoinIP" type="LineEdit" parent="." unique_id=1701177567]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.390625
+anchor_top = 0.6027778
+anchor_right = 0.7526042
+anchor_bottom = 0.6824074
+theme_override_font_sizes/font_size = 50
+placeholder_text = "host ip"
+metadata/_edit_use_anchors_ = true
+
+[node name="Username" type="LineEdit" parent="." unique_id=1664089813]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.43333334
+anchor_top = 0.9444444
+anchor_right = 0.56666666
+anchor_bottom = 0.9777778
+offset_left = -98.0
+offset_top = -77.0
+offset_right = 98.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_font_sizes/font_size = 50
+placeholder_text = "username"
+alignment = 1
+metadata/_edit_use_anchors_ = true
