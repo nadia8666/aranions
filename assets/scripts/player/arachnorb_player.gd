@@ -43,6 +43,7 @@ var legs: Array[Node3D] = []
 var leg_targets: Array[Node3D] = []
 var leg_offsets: Array[float] = []
 var leg_fall_speeds: Array[float] = []
+@export var max_stretch := 18.0 # controls the maximum distance the legs can be from the body and the body can be from the legs
 
 # movement
 @export var gravity := 120.0
@@ -179,7 +180,7 @@ func step_legs(delta: float):
 		current_foot_pos.y += sin(alpha * PI) * step_height
 		foot.global_position = current_foot_pos
 
-		# advance cycle	
+		# advance cycle 
 		if step_timer >= duration:
 			duration = step_duration_run if Input.is_action_pressed("run") else step_duration
 			is_stepping = false
@@ -193,9 +194,9 @@ func step_legs(delta: float):
 
 	# foot gravity, ball detection is kind of a bandaid but it works well enough.
 	var ball_grounded = body_cast.is_colliding()
-	var index = 0
-	for target in leg_targets:
+	for index in range(leg_count):
 		if !is_stepping or index != current_leg:
+			var target = leg_targets[index]
 			var fall_dist = (leg_fall_speeds[index] * delta) + step_cast_distance + 2.0
 			var ground_data = get_ground_pos(target.global_position, fall_dist)
 			var hit_pos: Vector3 = ground_data[0]
@@ -211,7 +212,11 @@ func step_legs(delta: float):
 			else:
 				leg_fall_speeds[index] = min(leg_fall_speeds[index] + (gravity * delta), terminal_velocity)
 				target.global_position.y -= leg_fall_speeds[index] * delta
-		index += 1
+
+				var outward_dir = (target_rotation * Quaternion(Vector3.UP, leg_offsets[index])).normalized() * Vector3.RIGHT
+				var home_pos = body.global_position + (outward_dir * step_radius) - Vector3(0, body_height - foot_offset, 0)
+				
+				target.global_position = target.global_position.lerp(home_pos, 3 * delta)
 
 	# reset if too low
 	if leg_targets[0].global_position.y <= 0:
@@ -229,6 +234,14 @@ func position_body():
 	average_pos /= leg_count
 	average_pos += Vector3(0, body_height, 0)
 
+	# clamp body
+	for iter in range(2):
+		for foot in leg_targets:
+			var dist = average_pos.distance_to(foot.global_position)
+			if dist > max_stretch:
+				var dir = (average_pos - foot.global_position).normalized()
+				average_pos = foot.global_position + dir * max_stretch
+
 	self.global_position = average_pos
 	body.global_position = average_pos
 	
@@ -236,6 +249,12 @@ func position_body():
 	for i in range(legs.size()):
 		var leg = legs[i]
 		var foot = leg_targets[i]
+		
+		# clamp feet
+		var foot_dist = foot.global_position.distance_to(average_pos)
+		if foot_dist > max_stretch:
+			var dir = (foot.global_position - average_pos).normalized()
+			foot.global_position = average_pos + dir * max_stretch
 		
 		leg.global_position = average_pos
 		var dir_to_foot = (foot.global_position - average_pos)

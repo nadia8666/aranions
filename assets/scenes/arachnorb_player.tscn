@@ -22,6 +22,7 @@ leg_template = NodePath("Leg")
 
 [node name="BodyCast" type="ShapeCast3D" parent="Body" unique_id=1662602688]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.66920996, 0)
+visible = false
 shape = SubResource("SphereShape3D_g4v7s")
 margin = 0.1
 max_results = 1
