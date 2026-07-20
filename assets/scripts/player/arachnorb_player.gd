@@ -30,7 +30,7 @@ var step_duration_run := 0.3
 var duration := step_duration
 var is_stepping := false
 var current_leg := 0
-var step_cast_distance = 6
+var step_cast_distance = 4
 
 # foot config
 @export var foot_offset := .8
@@ -60,22 +60,31 @@ var network_tick_timer := 0.0
 var network_tick_rate := 0.033
 
 # functions
-func get_ground_pos(target: Vector3) -> Array:
+
+# raycasts towrads the ground to calculate foot height
+func get_ground_pos(target: Vector3, cast_down_dist: float = step_cast_distance + 2.0) -> Array:
 	var space = get_world_3d().direct_space_state
-	var ray = PhysicsRayQueryParameters3D.create(target + Vector3(0, step_cast_distance, 0), target - Vector3(0, step_cast_distance + 2, 0))
+	var ray = PhysicsRayQueryParameters3D.create(target + Vector3(0, step_cast_distance, 0), target - Vector3(0, cast_down_dist, 0))
 	var hit = space.intersect_ray(ray)
 	if hit:
 		return [hit.position + Vector3(0, foot_offset, 0), true]
 	return [target - Vector3(0, body_height, 0) + Vector3(0, foot_offset, 0), false]
 
 func check_leg_collide(origin: Vector3, target: Vector3) -> Array:
-	var dist: float = abs(origin.y - target.y)
-	if (dist >= 1):
-		return [false, target]
+	var space = get_world_3d().direct_space_state
+	var elevated_origin = origin + Vector3(0, step_cast_distance, 0)
+	var elevated_target = target + Vector3(0, step_cast_distance, 0)
+	var ray = PhysicsRayQueryParameters3D.create(elevated_origin, elevated_target)
+	var hit = space.intersect_ray(ray)
 	
-	var ray = PhysicsRayQueryParameters3D.create(origin, target)
-	var hit = get_world_3d().direct_space_state.intersect_ray(ray)
-	return [hit != null, (hit.position + hit.normal) if hit else target]
+	if hit:
+		var down_ray = PhysicsRayQueryParameters3D.create(hit.position, hit.position - Vector3(0, step_cast_distance + 2, 0))
+		var down_hit = space.intersect_ray(down_ray)
+		if down_hit:
+			return [true, down_hit.position + Vector3(0, foot_offset, 0)]
+		return [true, hit.position]
+		
+	return [false, target]
 
 func create_legs():
 	for index in range(leg_count):
@@ -141,14 +150,14 @@ func step_legs(delta: float):
 			var outward_dir = target_leg_rot * Vector3.RIGHT
 			var walk_dir = target_rotation * Vector3.FORWARD
 			var ideal_foot = body.global_position + (outward_dir * step_radius)
+			ideal_foot.y = start_foot_pos.y - foot_offset
 			
 			if move_direction.length_squared() > 0.0:
 				ideal_foot += walk_dir * (step_length_run if Input.is_action_pressed("run") else step_length)
 			
 			var temp_target = get_ground_pos(ideal_foot)[0]
-			var collision_info = check_leg_collide(foot.global_position, temp_target)
+			var collision_info = check_leg_collide(start_foot_pos, temp_target)
 			target_foot_pos = collision_info[1]
-
 
 		step_timer += delta
 		var alpha = clamp(step_timer / duration, 0.0, 1.0)
@@ -158,8 +167,8 @@ func step_legs(delta: float):
 		var current_foot_pos = start_foot_pos.lerp(target_foot_pos, alpha)
 		current_foot_pos.y += sin(alpha * PI) * step_height
 		foot.global_position = current_foot_pos
-			
-		# advance cycle
+
+		# advance cycle	
 		if step_timer >= duration:
 			duration = step_duration_run if Input.is_action_pressed("run") else step_duration
 			is_stepping = false
@@ -175,17 +184,21 @@ func step_legs(delta: float):
 	var index = 0
 	for target in leg_targets:
 		if !is_stepping or index != current_leg:
-			var ground_data = get_ground_pos(target.global_position)
+			var fall_dist = (leg_fall_speeds[index] * delta) + step_cast_distance + 2.0
+			var ground_data = get_ground_pos(target.global_position, fall_dist)
 			var hit_pos: Vector3 = ground_data[0]
 			var is_hit: bool = ground_data[1]
 			
-			if ball_grounded or (is_hit and target.global_position.y < hit_pos.y):
+			if ball_grounded or (is_hit and target.global_position.y < hit_pos.y + 0.05):
 				if is_hit:
-					target.global_position.y = hit_pos.y
+					if abs(target.global_position.y - hit_pos.y) > 0.05:
+						target.global_position.y = lerp(target.global_position.y, hit_pos.y, 25.0 * delta)
+					else:
+						target.global_position.y = hit_pos.y
 				leg_fall_speeds[index] = 0.0
 			else:
 				leg_fall_speeds[index] = min(leg_fall_speeds[index] + (gravity * delta), terminal_velocity)
-			target.global_position.y -= leg_fall_speeds[index] * delta
+				target.global_position.y -= leg_fall_speeds[index] * delta
 		index += 1
 
 	if leg_targets[0].global_position.y <= 0:

@@ -39,9 +39,19 @@ func create_host(username: String) -> void:
 func join_server(ip: String, username) -> void:
 	local_username = "Player" if username == "" else username
 	
-	var target_ip = ip if not ip.is_empty() else DEFAULT_IP
+	var target_ip = DEFAULT_IP
+	var target_port = PORT
+	
+	if ":" in ip:
+		var parts = ip.split(":")
+		target_ip = parts[0]
+		target_port = int(parts[1])
+		print("SET TO TARGET PORT %s" % [target_port])
+	else:
+		target_ip = ip
+	
 	var peer = ENetMultiplayerPeer.new()
-	var error = peer.create_client(target_ip, PORT)
+	var error = peer.create_client(target_ip, target_port)
 	if error != OK:
 		print("[ERROR] failed to connect: %s" % [error])
 		return
@@ -115,8 +125,8 @@ func add_player(id: int) -> void:
 	player.name = str(id) 
 	players_container.add_child(player)
 	
-	var name = usernames.get(id, "i forgot to put a username, laugh at me!")
-	player.set_username(name)
+	var display_name = usernames.get(id, "i forgot to put a username, laugh at me!")
+	player.set_username(display_name)
 	player_spawned.emit(id, player)
 
 func _on_player_spawned_via_spawner(node: Node):
@@ -125,6 +135,6 @@ func _on_player_spawned_via_spawner(node: Node):
 	if not usernames.has(peer_id):
 		await get_tree().create_timer(1).timeout
 		
-	var name = usernames.get(peer_id, "i forgot to put a username, laugh at me!")
+	var display_name = usernames.get(peer_id, "i forgot to put a username, laugh at me!")
 	if node.has_method("set_username"):
-		node.set_username(name)
+		node.set_username(display_name)

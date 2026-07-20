@@ -36,9 +36,9 @@ size = Vector3(100.06836, 1, 82.11035)
 material = SubResource("StandardMaterial3D_mr7gh")
 
 [node name="CSGBox3D12" type="CSGBox3D" parent="Map" unique_id=1933771744]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.999998, 223.69598, -7.0450444)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.266154, 221.69598, -7.0450444)
 use_collision = true
-size = Vector3(1, 8, 1)
+size = Vector3(1, 4, 1)
 material = SubResource("StandardMaterial3D_mr7gh")
 
 [node name="CSGBox3D4" type="CSGBox3D" parent="Map" unique_id=1677551367]
@@ -54,9 +54,9 @@ size = Vector3(252.13684, 1, 82.11035)
 material = SubResource("StandardMaterial3D_mr7gh")
 
 [node name="CSGBox3D2" type="CSGBox3D" parent="Map" unique_id=639400732]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 217.0043, -14.568575)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -38.652763, 216.744, -14.568575)
 use_collision = true
-size = Vector3(100.06836, 9.062988, 14.055664)
+size = Vector3(34.623657, 9.062988, 14.055664)
 material = SubResource("StandardMaterial3D_mr7gh")
 
 [node name="CSGBox3D5" type="CSGBox3D" parent="Map" unique_id=1611580282]
@@ -66,39 +66,39 @@ size = Vector3(34.81067, 22.870483, 14.055664)
 material = SubResource("StandardMaterial3D_mr7gh")
 
 [node name="CSGBox3D6" type="CSGBox3D" parent="Map" unique_id=1367977583]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25.904755, 222.75836, -14.568575)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.704475, 222.75836, -14.568575)
 use_collision = true
-size = Vector3(36.25885, 20.571106, 14.055664)
+size = Vector3(1.8582916, 20.571106, 14.055664)
 material = SubResource("StandardMaterial3D_mr7gh")
 
 [node name="CSGBox3D7" type="CSGBox3D" parent="Map" unique_id=1621584021]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.7753525, 221.43175, -14.568575)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.9104786, 221.43175, -14.568575)
 use_collision = true
-size = Vector3(13.714859, 17.917877, 14.055664)
+size = Vector3(1.9851112, 17.917877, 14.055664)
 material = SubResource("StandardMaterial3D_mr7gh")
 
 [node name="CSGBox3D8" type="CSGBox3D" parent="Map" unique_id=307683449]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.734097, 220.71545, -14.568575)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.878564, 220.71545, -14.568575)
 use_collision = true
-size = Vector3(15.797371, 16.485306, 14.055664)
+size = Vector3(2.0863056, 16.485306, 14.055664)
 material = SubResource("StandardMaterial3D_mr7gh")
 
 [node name="CSGBox3D9" type="CSGBox3D" parent="Map" unique_id=12024074]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.305265, 219.93404, -14.568575)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.0947082, 219.93404, -14.568575)
 use_collision = true
-size = Vector3(18.655033, 14.922462, 14.055664)
+size = Vector3(3.5193791, 14.922462, 14.055664)
 material = SubResource("StandardMaterial3D_mr7gh")
 
 [node name="CSGBox3D10" type="CSGBox3D" parent="Map" unique_id=571037986]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.9814758, 218.98174, -14.568575)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.643738, 218.98174, -14.568575)
 use_collision = true
-size = Vector3(33.302612, 13.017872, 14.055664)
+size = Vector3(14.052185, 13.017872, 14.055664)
 material = SubResource("StandardMaterial3D_mr7gh")
 
 [node name="CSGBox3D11" type="CSGBox3D" parent="Map" unique_id=1221895069]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.90771484, 217.84439, -14.568575)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.425331, 217.84439, -14.568575)
 use_collision = true
-size = Vector3(41.080994, 10.743189, 14.055664)
+size = Vector3(8.045761, 10.743189, 14.055664)
 material = SubResource("StandardMaterial3D_mr7gh")
 
 [node name="Camera" type="Node" parent="." unique_id=687169928]
