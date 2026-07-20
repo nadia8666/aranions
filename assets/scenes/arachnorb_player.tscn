@@ -8,8 +8,9 @@
 margin = 0.1
 radius = 1.5
 
-[node name="ArachnorbPlayer" type="Node3D" unique_id=1133020816 node_paths=PackedStringArray("body", "body_cast", "leg_template")]
+[node name="ArachnorbPlayer" type="Node3D" unique_id=1133020816 node_paths=PackedStringArray("username_container", "body", "body_cast", "leg_template")]
 script = ExtResource("1_g6esu")
+username_container = NodePath("Username")
 body = NodePath("Body")
 body_height = 3.0
 body_cast = NodePath("BodyCast")
@@ -25,3 +26,13 @@ visible = false
 shape = SubResource("SphereShape3D_g4v7s")
 margin = 0.1
 max_results = 1
+
+[node name="Username" type="Label3D" parent="." unique_id=1947536419]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1378136, 0)
+pixel_size = 0.01
+billboard = 1
+no_depth_test = true
+outline_modulate = Color(0, 0, 0, 0.35686275)
+text = "username here!
+"
+font_size = 90

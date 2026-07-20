@@ -10,7 +10,7 @@ func _ready() -> void:
 	if multiplayer_spawner:
 		multiplayer_spawner.spawned.connect(_on_network_player_spawned)
 		
-	NetworkManager.setup_game_scene($Players)
+	NetworkManager.setup_game_scene($Players, multiplayer_spawner)
 
 func _on_player_spawned(peer_id: int, player_node: Node) -> void:
 	_configure_player_camera(player_node)

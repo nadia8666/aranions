@@ -10,7 +10,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_8omcj")
-player_scene = null
 
 [node name="Title" type="Label" parent="." unique_id=12199990]
 layout_mode = 1

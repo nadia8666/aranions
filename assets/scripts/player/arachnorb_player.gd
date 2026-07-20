@@ -11,6 +11,8 @@ extends Node3D
 
 # misc
 @export var camera: Camera3D
+@export var username: String
+@export var username_container: Label3D
 
 # body config
 @export var body: Node3D
@@ -20,14 +22,15 @@ extends Node3D
 # step config
 @export var step_radius := 6.0
 @export var step_height := 3.0
-@export var step_length := 4.0
-@export var step_length_run := 6.0
+@export var step_length := 6.0
+@export var step_length_run := 8.0
 var step_timer := 0.0
-const step_duration := 0.75
-const step_duration_run := 0.5
+var step_duration := 0.65
+var step_duration_run := 0.3
 var duration := step_duration
 var is_stepping := false
 var current_leg := 0
+var step_cast_distance = 6
 
 # foot config
 @export var foot_offset := .8
@@ -54,16 +57,25 @@ var target_foot_pos: Vector3
 
 # network
 var network_tick_timer := 0.0
-const network_tick_rate := 0.033
+var network_tick_rate := 0.033
 
 # functions
 func get_ground_pos(target: Vector3) -> Array:
 	var space = get_world_3d().direct_space_state
-	var ray = PhysicsRayQueryParameters3D.create(target + Vector3(0, 1, 0), target - Vector3(0, 3, 0))
+	var ray = PhysicsRayQueryParameters3D.create(target + Vector3(0, step_cast_distance, 0), target - Vector3(0, step_cast_distance + 2, 0))
 	var hit = space.intersect_ray(ray)
 	if hit:
 		return [hit.position + Vector3(0, foot_offset, 0), true]
 	return [target - Vector3(0, body_height, 0) + Vector3(0, foot_offset, 0), false]
+
+func check_leg_collide(origin: Vector3, target: Vector3) -> Array:
+	var dist: float = abs(origin.y - target.y)
+	if (dist >= 1):
+		return [false, target]
+	
+	var ray = PhysicsRayQueryParameters3D.create(origin, target)
+	var hit = get_world_3d().direct_space_state.intersect_ray(ray)
+	return [hit != null, (hit.position + hit.normal) if hit else target]
 
 func create_legs():
 	for index in range(leg_count):
@@ -132,8 +144,10 @@ func step_legs(delta: float):
 			
 			if move_direction.length_squared() > 0.0:
 				ideal_foot += walk_dir * (step_length_run if Input.is_action_pressed("run") else step_length)
-				
-			target_foot_pos = get_ground_pos(ideal_foot)[0]
+			
+			var temp_target = get_ground_pos(ideal_foot)[0]
+			var collision_info = check_leg_collide(foot.global_position, temp_target)
+			target_foot_pos = collision_info[1]
 
 
 		step_timer += delta
@@ -258,6 +272,10 @@ func _ready() -> void:
 		return
 	
 	create_legs()
+
+func set_username(user: String):
+	username = user
+	username_container.text = user
 
 func _physics_process(delta: float) -> void:
 	if is_multiplayer_authority():
