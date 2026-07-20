@@ -7,6 +7,7 @@ extends Node3D
 # 	body position is dependent on the 4 feet, and never rotates
 # 	individual legs rotate to face their target position, and reposition foot on their leg plane (LOCAL X & Y, Z = 0)
 # 	target rotation dictates the goal rotation but the arachnorb itself never actually rotates, they are purposefully decoupled from eachother
+# shoutout: https://www.superfuckingmario.com/
 
 # misc
 @export var camera: Camera3D
@@ -14,6 +15,7 @@ extends Node3D
 # body config
 @export var body: Node3D
 @export var body_height := 5.0
+@export var body_cast: ShapeCast3D
 
 # step config
 @export var step_radius := 6.0
@@ -36,8 +38,11 @@ var current_leg := 0
 var legs: Array[Node3D] = []
 var leg_targets: Array[Node3D] = []
 var leg_offsets: Array[float] = []
+var leg_fall_speeds: Array[float] = []
 
 # movement
+@export var gravity := 120.0
+@export var terminal_velocity := 70.0
 var target_rotation: Quaternion
 var move_direction := Vector3.ZERO
 
@@ -52,13 +57,13 @@ var network_tick_timer := 0.0
 const network_tick_rate := 0.033
 
 # functions
-func get_ground_pos(target: Vector3) -> Vector3:
+func get_ground_pos(target: Vector3) -> Array:
 	var space = get_world_3d().direct_space_state
-	var ray = PhysicsRayQueryParameters3D.create(target + Vector3(0, body_height * 3, 0), target - Vector3(0, body_height * 6.0, 0))
+	var ray = PhysicsRayQueryParameters3D.create(target + Vector3(0, 1, 0), target - Vector3(0, 3, 0))
 	var hit = space.intersect_ray(ray)
 	if hit:
-		return hit.position + Vector3(0, foot_offset, 0)
-	return target - Vector3(0, body_height, 0) + Vector3(0, foot_offset, 0)
+		return [hit.position + Vector3(0, foot_offset, 0), true]
+	return [target - Vector3(0, body_height, 0) + Vector3(0, foot_offset, 0), false]
 
 func create_legs():
 	for index in range(leg_count):
@@ -70,6 +75,7 @@ func create_legs():
 		add_child(leg)
 		legs.append(leg)
 		leg_offsets.append(angle)
+		leg_fall_speeds.append(0.0)
 		
 		var target = leg.find_child("LegTarget")
 		target.top_level = true
@@ -77,7 +83,7 @@ func create_legs():
 		
 		var outward = Quaternion(Vector3.UP, angle) * Vector3.RIGHT
 		var ideal_foot = self.global_position + (outward * step_radius)
-		target.global_position = get_ground_pos(ideal_foot)
+		target.global_position = get_ground_pos(ideal_foot)[0]
 		
 	remove_child(leg_template)
 
@@ -101,57 +107,77 @@ func rotate_to_input():
 
 # rotates and steps the current focused leg
 func step_legs(delta: float):
-	if not is_stepping:
-		return
-		
-	var leg = legs[current_leg]
-	var offset = leg_offsets[current_leg]
-	var foot = leg_targets[current_leg]
+	if is_stepping:
+		var leg = legs[current_leg]
+		var offset = leg_offsets[current_leg]
+		var foot = leg_targets[current_leg]
 
-	# calculate targets
-	if step_timer == 0.0:
-		start_leg_rot = leg.quaternion
-		start_foot_pos = foot.global_position
+		# calculate targets
+		if step_timer == 0.0:
+			start_leg_rot = leg.quaternion
+			start_foot_pos = foot.global_position
 
-		var ideal_rot = (target_rotation * Quaternion(Vector3.UP, offset)).normalized()
-		var angle_diff = start_leg_rot.angle_to(ideal_rot)
-		var max_angle = PI / 4.0
-		
-		if angle_diff > max_angle:
-			target_leg_rot = start_leg_rot.slerp(ideal_rot, max_angle / angle_diff)
-		else:
-			target_leg_rot = ideal_rot
-
-		var outward_dir = target_leg_rot * Vector3.RIGHT
-		var walk_dir = target_rotation * Vector3.FORWARD
-		var ideal_foot = body.global_position + (outward_dir * step_radius)
-		
-		if move_direction.length_squared() > 0.0:
-			ideal_foot += walk_dir * (step_length_run if Input.is_action_pressed("run") else step_length)
+			var ideal_rot = (target_rotation * Quaternion(Vector3.UP, offset)).normalized()
+			var angle_diff = start_leg_rot.angle_to(ideal_rot)
+			var max_angle = PI / 4.0
 			
-		target_foot_pos = get_ground_pos(ideal_foot)
+			if angle_diff > max_angle:
+				target_leg_rot = start_leg_rot.slerp(ideal_rot, max_angle / angle_diff)
+			else:
+				target_leg_rot = ideal_rot
+
+			var outward_dir = target_leg_rot * Vector3.RIGHT
+			var walk_dir = target_rotation * Vector3.FORWARD
+			var ideal_foot = body.global_position + (outward_dir * step_radius)
+			
+			if move_direction.length_squared() > 0.0:
+				ideal_foot += walk_dir * (step_length_run if Input.is_action_pressed("run") else step_length)
+				
+			target_foot_pos = get_ground_pos(ideal_foot)[0]
 
 
-	step_timer += delta
-	var alpha = clamp(step_timer / duration, 0.0, 1.0)
+		step_timer += delta
+		var alpha = clamp(step_timer / duration, 0.0, 1.0)
 
-	leg.quaternion = start_leg_rot.slerp(target_leg_rot, alpha)
+		leg.quaternion = start_leg_rot.slerp(target_leg_rot, alpha)
 
-	var current_foot_pos = start_foot_pos.lerp(target_foot_pos, alpha)
-	current_foot_pos.y += sin(alpha * PI) * step_height
-	foot.global_position = current_foot_pos
-		
-	# advance cycle
-	if step_timer >= duration:
-		duration = step_duration_run if Input.is_action_pressed("run") else step_duration
-		is_stepping = false
-		step_timer = 0.0
-		
-		var half_count = leg_count / 2
-		if current_leg < half_count:
-			current_leg += half_count
-		else:
-			current_leg = (current_leg - half_count + 1) % half_count
+		var current_foot_pos = start_foot_pos.lerp(target_foot_pos, alpha)
+		current_foot_pos.y += sin(alpha * PI) * step_height
+		foot.global_position = current_foot_pos
+			
+		# advance cycle
+		if step_timer >= duration:
+			duration = step_duration_run if Input.is_action_pressed("run") else step_duration
+			is_stepping = false
+			step_timer = 0.0
+			
+			var half_count = leg_count / 2
+			if current_leg < half_count:
+				current_leg += half_count
+			else:
+				current_leg = (current_leg - half_count + 1) % half_count
+
+	var ball_grounded = body_cast.is_colliding()
+	var index = 0
+	for target in leg_targets:
+		if !is_stepping or index != current_leg:
+			var ground_data = get_ground_pos(target.global_position)
+			var hit_pos: Vector3 = ground_data[0]
+			var is_hit: bool = ground_data[1]
+			
+			if ball_grounded or (is_hit and target.global_position.y < hit_pos.y):
+				if is_hit:
+					target.global_position.y = hit_pos.y
+				leg_fall_speeds[index] = 0.0
+			else:
+				leg_fall_speeds[index] = min(leg_fall_speeds[index] + (gravity * delta), terminal_velocity)
+			target.global_position.y -= leg_fall_speeds[index] * delta
+		index += 1
+
+	if leg_targets[0].global_position.y <= 0:
+		for target in leg_targets:
+			target.global_position = Vector3(0, 300, 0)
+
 
 # centers the body between all 4 feet
 func position_body():
@@ -207,7 +233,6 @@ func sync_leg_targets(positions: PackedVector3Array) -> void:
 	if is_multiplayer_authority():
 		return
 		
-	# TODO: might not be needed?
 	var max_index: int = min(positions.size(), leg_targets.size())
 	for index in range(max_index):
 		leg_targets[index].global_position = positions[index]

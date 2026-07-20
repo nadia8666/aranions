@@ -4,12 +4,24 @@
 [ext_resource type="PackedScene" uid="uid://b1nmutfv0wsra" path="res://assets/scenes/leg.tscn" id="2_lm8ba"]
 [ext_resource type="PackedScene" uid="uid://dcncrlmwgen8j" path="res://assets/scenes/body.tscn" id="3_3s3ph"]
 
-[node name="ArachnorbPlayer" type="Node3D" unique_id=1133020816 node_paths=PackedStringArray("body", "leg_template")]
+[sub_resource type="SphereShape3D" id="SphereShape3D_g4v7s"]
+margin = 0.1
+radius = 1.5
+
+[node name="ArachnorbPlayer" type="Node3D" unique_id=1133020816 node_paths=PackedStringArray("body", "body_cast", "leg_template")]
 script = ExtResource("1_g6esu")
 body = NodePath("Body")
 body_height = 3.0
+body_cast = NodePath("BodyCast")
 leg_template = NodePath("Leg")
 
 [node name="Leg" parent="." unique_id=1078051081 instance=ExtResource("2_lm8ba")]
 
 [node name="Body" parent="." unique_id=1639314582 instance=ExtResource("3_3s3ph")]
+
+[node name="BodyCast" type="ShapeCast3D" parent="." unique_id=1662602688]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.66920996, 0)
+visible = false
+shape = SubResource("SphereShape3D_g4v7s")
+margin = 0.1
+max_results = 1
