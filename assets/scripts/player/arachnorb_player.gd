@@ -33,7 +33,8 @@ var current_leg := 0
 var step_cast_distance = 4
 
 # foot config
-@export var foot_offset := .8
+@export var foot_offset := 0.8
+@export var foot_margin := 0.5
 
 # leg config
 @export var leg_count: int = 4
@@ -61,7 +62,7 @@ var network_tick_rate := 0.033
 
 # functions
 
-# raycasts towrads the ground to calculate foot height
+# raycasts towards the ground to calculate foot height
 func get_ground_pos(target: Vector3, cast_down_dist: float = step_cast_distance + 2.0) -> Array:
 	var space = get_world_3d().direct_space_state
 	var ray = PhysicsRayQueryParameters3D.create(target + Vector3(0, step_cast_distance, 0), target - Vector3(0, cast_down_dist, 0))
@@ -70,7 +71,9 @@ func get_ground_pos(target: Vector3, cast_down_dist: float = step_cast_distance 
 		return [hit.position + Vector3(0, foot_offset, 0), true]
 	return [target - Vector3(0, body_height, 0) + Vector3(0, foot_offset, 0), false]
 
+# modifies the foot's target position to prevent walking into walls
 func check_leg_collide(origin: Vector3, target: Vector3) -> Array:
+	# horizontal
 	var space = get_world_3d().direct_space_state
 	var elevated_origin = origin + Vector3(0, step_cast_distance, 0)
 	var elevated_target = target + Vector3(0, step_cast_distance, 0)
@@ -78,14 +81,21 @@ func check_leg_collide(origin: Vector3, target: Vector3) -> Array:
 	var hit = space.intersect_ray(ray)
 	
 	if hit:
-		var down_ray = PhysicsRayQueryParameters3D.create(hit.position, hit.position - Vector3(0, step_cast_distance + 2, 0))
+		# vertical
+		var flat_normal = hit.normal.slide(Vector3.UP).normalized()
+		var adjusted_pos = hit.position
+		if flat_normal.length_squared() > foot_margin:
+			adjusted_pos += flat_normal * foot_margin
+			
+		var down_ray = PhysicsRayQueryParameters3D.create(adjusted_pos, adjusted_pos - Vector3(0, step_cast_distance + 2, 0))
 		var down_hit = space.intersect_ray(down_ray)
 		if down_hit:
 			return [true, down_hit.position + Vector3(0, foot_offset, 0)]
-		return [true, hit.position]
+		return [true, adjusted_pos - Vector3(0, step_cast_distance, 0)]
 		
 	return [false, target]
 
+# sets up legs
 func create_legs():
 	for index in range(leg_count):
 		var angle = fposmod(((TAU / leg_count) * index) + (PI / 4.0), TAU)
@@ -133,7 +143,7 @@ func step_legs(delta: float):
 		var offset = leg_offsets[current_leg]
 		var foot = leg_targets[current_leg]
 
-		# calculate targets
+		# calculate foot targets
 		if step_timer == 0.0:
 			start_leg_rot = leg.quaternion
 			start_foot_pos = foot.global_position
@@ -159,6 +169,7 @@ func step_legs(delta: float):
 			var collision_info = check_leg_collide(start_foot_pos, temp_target)
 			target_foot_pos = collision_info[1]
 
+		# animate foot
 		step_timer += delta
 		var alpha = clamp(step_timer / duration, 0.0, 1.0)
 
@@ -180,6 +191,7 @@ func step_legs(delta: float):
 			else:
 				current_leg = (current_leg - half_count + 1) % half_count
 
+	# foot gravity, ball detection is kind of a bandaid but it works well enough.
 	var ball_grounded = body_cast.is_colliding()
 	var index = 0
 	for target in leg_targets:
@@ -201,6 +213,7 @@ func step_legs(delta: float):
 				target.global_position.y -= leg_fall_speeds[index] * delta
 		index += 1
 
+	# reset if too low
 	if leg_targets[0].global_position.y <= 0:
 		for target in leg_targets:
 			target.global_position = Vector3(0, 300, 0)
@@ -219,6 +232,7 @@ func position_body():
 	self.global_position = average_pos
 	body.global_position = average_pos
 	
+	# rotate legs: prevent; Drifts (We dont like Islands !)
 	for i in range(legs.size()):
 		var leg = legs[i]
 		var foot = leg_targets[i]

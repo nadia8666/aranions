@@ -13,16 +13,15 @@ script = ExtResource("1_g6esu")
 username_container = NodePath("Username")
 body = NodePath("Body")
 body_height = 3.0
-body_cast = NodePath("BodyCast")
+body_cast = NodePath("Body/BodyCast")
 leg_template = NodePath("Leg")
 
 [node name="Leg" parent="." unique_id=1078051081 instance=ExtResource("2_lm8ba")]
 
 [node name="Body" parent="." unique_id=1639314582 instance=ExtResource("3_3s3ph")]
 
-[node name="BodyCast" type="ShapeCast3D" parent="." unique_id=1662602688]
+[node name="BodyCast" type="ShapeCast3D" parent="Body" unique_id=1662602688]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.66920996, 0)
-visible = false
 shape = SubResource("SphereShape3D_g4v7s")
 margin = 0.1
 max_results = 1
