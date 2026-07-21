@@ -14,9 +14,13 @@ extends Node3D
 @export var username: String
 @export var username_container: Label3D
 
+# cursor
+@export var target_cursor: Node3D
+@export var current_cursor: Node3D
+
 # body config
 @export var body: Node3D
-@export var body_height := 5.0
+@export var body_height := 3.0
 @export var body_cast: ShapeCast3D
 
 # step config
@@ -44,6 +48,8 @@ var leg_targets: Array[Node3D] = []
 var leg_offsets: Array[float] = []
 var leg_fall_speeds: Array[float] = []
 @export var max_stretch := 18.0 # controls the maximum distance the legs can be from the body and the body can be from the legs
+@export var leg_out_min := 0.3 # how far out the arachnorbian legs are for the first joint at minimum slope
+@export var leg_out_max := 0.7 # how far out the arachnorbian legs are for the first joint at maximum slope
 
 # movement
 @export var gravity := 120.0
@@ -65,9 +71,8 @@ var network_tick_rate := 0.033
 
 # raycasts towards the ground to calculate foot height
 func get_ground_pos(target: Vector3, cast_down_dist: float = step_cast_distance + 2.0) -> Array:
-	var space = get_world_3d().direct_space_state
 	var ray = PhysicsRayQueryParameters3D.create(target + Vector3(0, step_cast_distance, 0), target - Vector3(0, cast_down_dist, 0))
-	var hit = space.intersect_ray(ray)
+	var hit = get_world_3d().direct_space_state.intersect_ray(ray)
 	if hit:
 		return [hit.position + Vector3(0, foot_offset, 0), true]
 	return [target - Vector3(0, body_height, 0) + Vector3(0, foot_offset, 0), false]
@@ -103,6 +108,8 @@ func create_legs():
 		var leg = leg_template.duplicate()
 		leg.quaternion = Quaternion(Vector3.UP, angle)
 		leg.top_level = true
+		leg.name = "Leg %s" % [index]
+		leg.find_child("Index").text = str(index)
 
 		add_child(leg)
 		legs.append(leg)
@@ -130,15 +137,17 @@ func rotate_to_input():
 		move_direction = (Quaternion(Vector3.UP, atan2(-dir.x, dir.y)) * (camera.quaternion * Vector3.FORWARD).slide(Vector3.UP)).normalized().slide(Vector3.UP)
 		var turn = (self.quaternion * Vector3.FORWARD).signed_angle_to(move_direction, Vector3.UP)
 		target_rotation = self.quaternion * Quaternion(Vector3.UP, turn)
-
-		if not is_stepping:
-			duration = step_duration_run if Input.is_action_pressed("run") else step_duration
-			is_stepping = true
 	else:
 		move_direction = Vector3.ZERO
 
 # rotates and steps the current focused leg
 func step_legs(delta: float):
+	var has_input = move_direction.length_squared() > 0
+	
+	if not is_stepping and has_input:
+		is_stepping = true
+		duration = step_duration_run if Input.is_action_pressed("run") else step_duration
+		
 	if is_stepping:
 		var leg = legs[current_leg]
 		var offset = leg_offsets[current_leg]
@@ -183,7 +192,6 @@ func step_legs(delta: float):
 		# advance cycle 
 		if step_timer >= duration:
 			duration = step_duration_run if Input.is_action_pressed("run") else step_duration
-			is_stepping = false
 			step_timer = 0.0
 			
 			var half_count = leg_count / 2
@@ -191,6 +199,7 @@ func step_legs(delta: float):
 				current_leg += half_count
 			else:
 				current_leg = (current_leg - half_count + 1) % half_count
+			is_stepping = false
 
 	# foot gravity, ball detection is kind of a bandaid but it works well enough.
 	var ball_grounded = body_cast.is_colliding()
@@ -215,13 +224,16 @@ func step_legs(delta: float):
 
 				var outward_dir = (target_rotation * Quaternion(Vector3.UP, leg_offsets[index])).normalized() * Vector3.RIGHT
 				var home_pos = body.global_position + (outward_dir * step_radius) - Vector3(0, body_height - foot_offset, 0)
-				
 				target.global_position = target.global_position.lerp(home_pos, 3 * delta)
 
 	# reset if too low
 	if leg_targets[0].global_position.y <= 0:
+		var index = 0
 		for target in leg_targets:
-			target.global_position = Vector3(0, 300, 0)
+			var outward_dir = (target_rotation * Quaternion(Vector3.UP, leg_offsets[index])).normalized() * Vector3.RIGHT
+			var home_pos = Vector3(0, 300, 0) + (outward_dir * step_radius) - Vector3(0, body_height - foot_offset, 0)
+			target.global_position = home_pos
+			index += 1
 
 
 # centers the body between all 4 feet
@@ -275,7 +287,7 @@ func update_leg_pose(leg_index: int):
 	
 	var dist = leg.global_position.distance_to(foot.global_position)
 	var factor = clamp(((dist / (step_radius * 1.85)) - .6) * 2, 0, 1)
-	skeleton.set_bone_pose_rotation(index, Quaternion(0, .7, lerp(.3, .7, factor), 0))
+	skeleton.set_bone_pose_rotation(index, Quaternion(0, .7, lerp(leg_out_min, leg_out_max, factor), 0))
 
 # replicates leg positions
 func _send_leg_positions() -> void:
@@ -319,14 +331,74 @@ func _ready() -> void:
 	
 	create_legs()
 
+# sets username and fills out its ui
 func set_username(user: String):
 	username = user
 	username_container.text = user
 
-func _physics_process(delta: float) -> void:
+# gets the "physical" forward vector of the arachnorb
+func get_pseudo_forward() -> Vector3:
+	var front_center = Vector3.ZERO
+	var back_center = Vector3.ZERO
+	var half_count = leg_count / 2
+	var front_legs = 0
+	var back_legs = 0
+	
+	for i in range(leg_count):
+		var local_angle = fposmod(leg_offsets[i], TAU)
+		
+		if local_angle < PI / 2.0 or local_angle > 3.0 * PI / 2.0:
+			front_center += leg_targets[i].global_position
+			front_legs += 1
+		else:
+			back_center += leg_targets[i].global_position
+			back_legs += 1
+	
+	if front_legs > 0 and back_legs > 0:
+		front_center /= front_legs
+		back_center /= back_legs
+		var dir = front_center - back_center
+		dir.y = 0.0
+		
+		if dir.length_squared() > .001:
+			return dir.normalized()
+	
+	return Vector3.FORWARD
+
+func cursor_cast(center) -> Array:
+	var ray = PhysicsRayQueryParameters3D.create(center + Vector3(0, 15, 0), center - Vector3(0, 20, 0))
+	var hit = get_world_3d().direct_space_state.intersect_ray(ray)
+	return [(hit.position + hit.normal / 4) if hit else (center - Vector3(0, 2.963, 0)), hit]
+
+# rotates both the current and target cursors
+func update_cursors(delta: float):
+	var center = self.global_position
+	
+	target_cursor.quaternion = target_cursor.quaternion.slerp(target_rotation, 15 * delta)
+	var target_res = cursor_cast(center + target_cursor.quaternion * Vector3.FORWARD * 13)
+	var target_pos = target_res[0]
+	var hit_target = target_res[1]
+	if hit_target:
+		var diff = Quaternion(target_rotation * Vector3.UP, hit_target.normal)
+		target_cursor.quaternion = diff * target_cursor.quaternion
+	target_cursor.global_position = target_pos
+	
+	var current_rotation = Basis.looking_at(get_pseudo_forward()).get_rotation_quaternion() * Quaternion(Vector3.UP, PI / 2)
+	current_cursor.quaternion = current_cursor.quaternion.slerp(current_rotation, 3 * delta)
+	var current_res = cursor_cast(center + current_cursor.quaternion * Vector3.FORWARD * 10)
+	var current_pos = current_res[0]
+	var hit_current = current_res[1]
+	if hit_current:
+		var diff = Quaternion(current_rotation * Vector3.UP, hit_current.normal)
+		current_cursor.quaternion = diff * current_cursor.quaternion
+	current_cursor.global_position = current_pos
+	
+
+func _physics_process(delta: float):
 	if is_multiplayer_authority():
 		rotate_to_input()
 		step_legs(delta)
+		update_cursors(delta)
 		
 		# handle network ticks
 		network_tick_timer += delta

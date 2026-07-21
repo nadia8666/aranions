@@ -70,3 +70,11 @@ active = true
 influence = 1.0
 script = ExtResource("2_ekfm5")
 metadata/_custom_type_script = "uid://rn6oo70uajnb"
+
+[node name="Index" type="Label3D" parent="." index="2" unique_id=1951362498]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.7748375, 8.106802, 0)
+pixel_size = 0.01
+billboard = 1
+no_depth_test = true
+text = "1"
+font_size = 150

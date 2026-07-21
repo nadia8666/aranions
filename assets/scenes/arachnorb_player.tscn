@@ -3,16 +3,35 @@
 [ext_resource type="Script" uid="uid://dlag8u3v0j3ec" path="res://assets/scripts/player/arachnorb_player.gd" id="1_g6esu"]
 [ext_resource type="PackedScene" uid="uid://b1nmutfv0wsra" path="res://assets/scenes/leg.tscn" id="2_lm8ba"]
 [ext_resource type="PackedScene" uid="uid://dcncrlmwgen8j" path="res://assets/scenes/body.tscn" id="3_3s3ph"]
+[ext_resource type="PackedScene" uid="uid://cggts33jg2twu" path="res://assets/scenes/movement_cursor.tscn" id="4_lm8ba"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_g4v7s"]
 margin = 0.1
 radius = 1.5
 
-[node name="ArachnorbPlayer" type="Node3D" unique_id=1133020816 node_paths=PackedStringArray("username_container", "body", "body_cast", "leg_template")]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lm8ba"]
+transparency = 1
+depth_draw_mode = 1
+albedo_color = Color(0, 0.83137256, 0.20392157, 0.007843138)
+emission_enabled = true
+emission = Color(0, 0.80326253, 0, 1)
+emission_energy_multiplier = 6.76
+disable_receive_shadows = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3s3ph"]
+transparency = 1
+albedo_color = Color(0.3882353, 0.74509805, 1, 0.03137255)
+emission_enabled = true
+emission = Color(0, 0.7882353, 1, 1)
+emission_energy_multiplier = 1.51
+disable_receive_shadows = true
+
+[node name="ArachnorbPlayer" type="Node3D" unique_id=1133020816 node_paths=PackedStringArray("username_container", "target_cursor", "current_cursor", "body", "body_cast", "leg_template")]
 script = ExtResource("1_g6esu")
 username_container = NodePath("Username")
+target_cursor = NodePath("TargetCursor")
+current_cursor = NodePath("CurrentCursor")
 body = NodePath("Body")
-body_height = 3.0
 body_cast = NodePath("Body/BodyCast")
 leg_template = NodePath("Leg")
 
@@ -36,3 +55,20 @@ outline_modulate = Color(0, 0, 0, 0.35686275)
 text = "username here!
 "
 font_size = 90
+
+[node name="CurrentCursor" parent="." unique_id=436933678 instance=ExtResource("4_lm8ba")]
+transform = Transform3D(0.8, 0, 0, 0, 1, 0, 0, 0, 0.65, 0, -2.9631953, -11.027765)
+
+[node name="Plane" parent="CurrentCursor" index="0" unique_id=903378643]
+transform = Transform3D(0.99999994, 0, 0, 0, 0.99999994, 0, 0, 0, 0.99999994, 0, 0, 0.89269733)
+material_override = SubResource("StandardMaterial3D_lm8ba")
+
+[node name="TargetCursor" parent="." unique_id=1344925368 instance=ExtResource("4_lm8ba")]
+transform = Transform3D(1.25, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2.9631953, -13.765762)
+
+[node name="Plane" parent="TargetCursor" index="0" unique_id=903378643]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.6070347)
+material_override = SubResource("StandardMaterial3D_3s3ph")
+
+[editable path="CurrentCursor"]
+[editable path="TargetCursor"]

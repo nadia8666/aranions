@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://cggts33jg2twu"]
+
+[ext_resource type="PackedScene" uid="uid://y0n7x5l3axes" path="res://assets/models/movement_cursor.glb" id="1_7xqfl"]
+
+[node name="movement_cursor" unique_id=436933678 instance=ExtResource("1_7xqfl")]
+
+[node name="Plane" parent="." index="0" unique_id=903378643]
+cast_shadow = 0
