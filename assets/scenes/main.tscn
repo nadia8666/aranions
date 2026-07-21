@@ -139,7 +139,7 @@ autoplay = true
 playback_type = 1
 parameters/looping = true
 
-[node name="Sky3D" type="WorldEnvironment" parent="Music" unique_id=1937438365]
+[node name="Sky3D" type="WorldEnvironment" parent="." unique_id=1937438365]
 environment = ExtResource("5_48cn3")
 camera_attributes = ExtResource("8_ua5jh")
 compositor = ExtResource("9_ytb86")
@@ -154,18 +154,18 @@ night_sky_contribution = 0.51
 wind_direction = 2.35619451204804
 metadata/_custom_type_script = "uid://deo0gxkmk2ahd"
 
-[node name="SunLight" type="DirectionalLight3D" parent="Music/Sky3D" unique_id=1365744388]
+[node name="SunLight" type="DirectionalLight3D" parent="Sky3D" unique_id=1365744388]
 transform = Transform3D(0.54517317, -0.30339986, 0.78149515, 0, 0.932212, 0.36191267, -0.8383234, -0.19730507, 0.508217, 0.78149515, 0.36191267, 0.508217)
 light_color = Color(0.9944765, 0.8682647, 0.8050207, 1)
 light_energy = 2.475
 shadow_enabled = true
 
-[node name="MoonLight" type="DirectionalLight3D" parent="Music/Sky3D" unique_id=1802990958]
+[node name="MoonLight" type="DirectionalLight3D" parent="Sky3D" unique_id=1802990958]
 transform = Transform3D(0, -0.36665514, 0.9303569, 0.974487, -0.20881286, -0.08229349, 0.22444382, 0.90662074, 0.3573007, 0.9303569, -0.08229349, 0.3573007)
 light_color = Color(0.572549, 0.776471, 0.956863, 1)
 light_energy = 0.0
 
-[node name="SkyDome" type="Node" parent="Music/Sky3D" unique_id=1312501643]
+[node name="SkyDome" type="Node" parent="Sky3D" unique_id=1312501643]
 script = ExtResource("7_ua5jh")
 exposure = 0.51
 sun_azimuth = -2.147392
@@ -177,7 +177,7 @@ moon_light_energy = 5.325
 wind_direction = 2.35619451204804
 cumulus_intensity = 0.425
 
-[node name="TimeOfDay" type="Node" parent="Music/Sky3D" unique_id=2074352309]
+[node name="TimeOfDay" type="Node" parent="Sky3D" unique_id=2074352309]
 script = ExtResource("8_ytb86")
 editor_time_enabled = false
 dome_path = NodePath("../SkyDome")

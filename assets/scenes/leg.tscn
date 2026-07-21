@@ -28,6 +28,8 @@ material_override = SubResource("StandardMaterial3D_mr7gh")
 
 [node name="CCDIK3D" type="CCDIK3D" parent="LegArmature/Skeleton3D" index="1" unique_id=1226450874]
 max_iterations = 32
+angular_delta_limit = 0.2617993877991494
+deterministic = true
 setting_count = 1
 settings/0/target_node = NodePath("../../../LegTarget")
 settings/0/root_bone_name = "Leg1"

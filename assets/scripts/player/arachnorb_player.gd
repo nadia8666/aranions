@@ -13,6 +13,7 @@ extends Node3D
 @export var camera: Camera3D
 @export var username: String
 @export var username_container: Label3D
+var turn_direction := 0.0
 
 # cursor
 @export var target_cursor: Node3D
@@ -26,7 +27,7 @@ extends Node3D
 # step config
 @export var step_radius := 6.0
 @export var step_height := 3.0
-@export var step_length := 6.0
+@export var step_length := 5.0
 @export var step_length_run := 8.0
 var step_timer := 0.0
 var step_duration := 0.65
@@ -133,18 +134,36 @@ func rotate_to_input():
 	
 	var dir = Input.get_vector("move_left", "move_right", "move_down", "move_up", 0.1)
 	
-	if dir.length() > 0:
+	if dir.length() > 0 and not Input.is_action_pressed("center_home"):
 		move_direction = (Quaternion(Vector3.UP, atan2(-dir.x, dir.y)) * (camera.quaternion * Vector3.FORWARD).slide(Vector3.UP)).normalized().slide(Vector3.UP)
 		var turn = (self.quaternion * Vector3.FORWARD).signed_angle_to(move_direction, Vector3.UP)
 		target_rotation = self.quaternion * Quaternion(Vector3.UP, turn)
 	else:
 		move_direction = Vector3.ZERO
+		
+	turn_direction = 0.0
+	if Input.is_action_pressed("turn_left"): turn_direction += 1.0
+	if Input.is_action_pressed("turn_right"): turn_direction -= 1.0
 
 # rotates and steps the current focused leg
 func step_legs(delta: float):
-	var has_input = move_direction.length_squared() > 0
+	var force_home = Input.is_action_pressed("center_home")
+	var has_input = move_direction.length_squared() > 0 or turn_direction != 0.0 or force_home
 	
 	if not is_stepping and has_input:
+		if move_direction.length_squared() == 0 and turn_direction == 0.0:
+			var ideal_rot = (target_rotation * Quaternion(Vector3.UP, leg_offsets[current_leg])).normalized()
+			var ideal_foot = body.global_position + (ideal_rot * Vector3.RIGHT * step_radius)
+			ideal_foot.y = leg_targets[current_leg].global_position.y
+			
+			if leg_targets[current_leg].global_position.distance_to(ideal_foot) < 0.5:
+				var half_count = leg_count / 2
+				if current_leg < half_count:
+					current_leg += half_count
+				else:
+					current_leg = (current_leg - half_count + 1) % half_count
+				return
+				
 		is_stepping = true
 		duration = step_duration_run if Input.is_action_pressed("run") else step_duration
 		
@@ -155,6 +174,10 @@ func step_legs(delta: float):
 
 		# calculate foot targets
 		if step_timer == 0.0:
+			if turn_direction != 0.0 and move_direction.length_squared() == 0.0:
+				var turn_increment = (PI / 4.0) / leg_count
+				target_rotation = (target_rotation * Quaternion(Vector3.UP, turn_direction * turn_increment)).normalized()
+
 			start_leg_rot = leg.quaternion
 			start_foot_pos = foot.global_position
 
