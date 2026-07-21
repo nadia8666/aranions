@@ -374,6 +374,8 @@ func cursor_cast(center) -> Array:
 func update_cursors(delta: float):
 	var center = self.global_position
 	
+	target_cursor.rotation.x = 0
+	target_cursor.rotation.z = 0
 	target_cursor.quaternion = target_cursor.quaternion.slerp(target_rotation, 15 * delta)
 	var target_res = cursor_cast(center + target_cursor.quaternion * Vector3.FORWARD * 13)
 	var target_pos = target_res[0]
@@ -383,6 +385,8 @@ func update_cursors(delta: float):
 		target_cursor.quaternion = diff * target_cursor.quaternion
 	target_cursor.global_position = target_pos
 	
+	current_cursor.rotation.x = 0
+	current_cursor.rotation.z = 0
 	var current_rotation = Basis.looking_at(get_pseudo_forward()).get_rotation_quaternion() * Quaternion(Vector3.UP, PI / 2)
 	current_cursor.quaternion = current_cursor.quaternion.slerp(current_rotation, 3 * delta)
 	var current_res = cursor_cast(center + current_cursor.quaternion * Vector3.FORWARD * 10)
