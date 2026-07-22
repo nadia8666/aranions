@@ -23,6 +23,7 @@ var turn_direction := 0.0
 @export var body: Node3D
 @export var body_height := 3.0
 @export var body_cast: ShapeCast3D
+@export var body_mesh: MeshInstance3D
 
 # step config
 @export var step_radius := 6.0
@@ -124,6 +125,9 @@ func create_legs():
 		var outward = Quaternion(Vector3.UP, angle) * Vector3.RIGHT
 		var ideal_foot = self.global_position + (outward * step_radius)
 		target.global_position = get_ground_pos(ideal_foot)[0]
+		
+		var unique = leg.mesh.get_active_material(0).duplicate()
+		leg.mesh.material_override = unique
 		
 	remove_child(leg_template)
 

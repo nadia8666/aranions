@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://dlag8u3v0j3ec" path="res://assets/scripts/player/arachnorb_player.gd" id="1_g6esu"]
 [ext_resource type="PackedScene" uid="uid://b1nmutfv0wsra" path="res://assets/scenes/leg.tscn" id="2_lm8ba"]
 [ext_resource type="PackedScene" uid="uid://dcncrlmwgen8j" path="res://assets/scenes/body.tscn" id="3_3s3ph"]
+[ext_resource type="Material" uid="uid://cyrs0pt3smbwl" path="res://assets/materials/arachnorb_material.tres" id="4_3s3ph"]
 [ext_resource type="PackedScene" uid="uid://cggts33jg2twu" path="res://assets/scenes/movement_cursor.tscn" id="4_lm8ba"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_g4v7s"]
@@ -26,18 +27,22 @@ emission = Color(0, 0.7882353, 1, 1)
 emission_energy_multiplier = 1.51
 disable_receive_shadows = true
 
-[node name="ArachnorbPlayer" type="Node3D" unique_id=1133020816 node_paths=PackedStringArray("username_container", "target_cursor", "current_cursor", "body", "body_cast", "leg_template")]
+[node name="ArachnorbPlayer" type="Node3D" unique_id=1133020816 node_paths=PackedStringArray("username_container", "target_cursor", "current_cursor", "body", "body_cast", "body_mesh", "leg_template")]
 script = ExtResource("1_g6esu")
 username_container = NodePath("Username")
 target_cursor = NodePath("TargetCursor")
 current_cursor = NodePath("CurrentCursor")
 body = NodePath("Body")
 body_cast = NodePath("Body/BodyCast")
+body_mesh = NodePath("Body/BodyArmature/Skeleton3D/Body")
 leg_template = NodePath("Leg")
 
 [node name="Leg" parent="." unique_id=1078051081 instance=ExtResource("2_lm8ba")]
 
 [node name="Body" parent="." unique_id=1639314582 instance=ExtResource("3_3s3ph")]
+
+[node name="Body" parent="Body/BodyArmature/Skeleton3D" parent_id_path=PackedInt32Array(1639314582, 1182400211) index="0" unique_id=1641947159]
+material_override = ExtResource("4_3s3ph")
 
 [node name="BodyCast" type="ShapeCast3D" parent="Body" unique_id=1662602688]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.66920996, 0)
@@ -70,5 +75,6 @@ transform = Transform3D(1.25, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2.9631953, -13.765762)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.6070347)
 material_override = SubResource("StandardMaterial3D_3s3ph")
 
+[editable path="Body"]
 [editable path="CurrentCursor"]
 [editable path="TargetCursor"]

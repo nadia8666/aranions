@@ -12,6 +12,7 @@
 [ext_resource type="CameraAttributesPractical" uid="uid://ckbg7isk03rh5" path="res://camera_attributes.tres" id="8_ua5jh"]
 [ext_resource type="Script" uid="uid://cjmkcj8hwm7ts" path="res://addons/sky_3d/src/TimeOfDay.gd" id="8_ytb86"]
 [ext_resource type="Compositor" uid="uid://vl88m4h4arfm" path="res://compositor.tres" id="9_ytb86"]
+[ext_resource type="PackedScene" uid="uid://b84scvmyl4i68" path="res://assets/scenes/arachnorb_customization.tscn" id="13_ytb86"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mr7gh"]
 albedo_color = Color(0.39098924, 0, 0.108241804, 1)
@@ -135,7 +136,6 @@ metadata/_custom_type_script = "uid://bd046eokvcnu2"
 [node name="Music" type="AudioStreamPlayer" parent="." unique_id=609018976]
 stream = ExtResource("6_vesw4")
 volume_db = -13.382
-autoplay = true
 playback_type = 1
 parameters/looping = true
 
@@ -186,3 +186,5 @@ day = 2
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=85824106]
 _spawnable_scenes = PackedStringArray("uid://bk1i3qevelj6e")
 spawn_path = NodePath("../Players")
+
+[node name="ArachnorbCustomization" parent="." unique_id=1874491190 instance=ExtResource("13_ytb86")]

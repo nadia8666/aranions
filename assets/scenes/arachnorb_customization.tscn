@@ -1,0 +1,152 @@
+[gd_scene format=3 uid="uid://b84scvmyl4i68"]
+
+[ext_resource type="Texture2D" uid="uid://cckuvc47rx6de" path="res://assets/textures/ui/arachnorb_ball.png" id="1_d6tbo"]
+[ext_resource type="Script" uid="uid://n2e723grbngm" path="res://assets/scripts/arachnorb_customization.gd" id="1_jxdgr"]
+[ext_resource type="Script" uid="uid://7bgfvdf6bdp" path="res://assets/scripts/mouse_detector_area2d.gd" id="2_jyy8t"]
+[ext_resource type="Texture2D" uid="uid://0ock73in8ekf" path="res://assets/textures/ui/arachnorb_leg.png" id="2_v2fcp"]
+[ext_resource type="AudioStream" uid="uid://qw20uvbgl4c6" path="res://assets/sounds/sfx/ui/arachnorb_paint.mp3" id="4_jyy8t"]
+
+[node name="ArachnorbCustomization" type="Control" unique_id=1874491190 node_paths=PackedStringArray("color_picker", "head", "legs", "paint_sound", "button", "ui")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_jxdgr")
+color_picker = NodePath("Customizer/ColorPicker")
+head = NodePath("Customizer/Control/Head")
+legs = [NodePath("Customizer/Control/Leg0"), NodePath("Customizer/Control/Leg1"), NodePath("Customizer/Control/Leg2"), NodePath("Customizer/Control/Leg3")]
+paint_sound = NodePath("Customizer/AudioStreamPlayer")
+button = NodePath("Button")
+ui = NodePath("Customizer")
+
+[node name="Customizer" type="Control" parent="." unique_id=606831037]
+visible = false
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+mouse_filter = 2
+
+[node name="ColorPicker" type="ColorPicker" parent="Customizer" unique_id=1359051709]
+layout_mode = 0
+offset_left = 41.0
+offset_top = 35.0
+offset_right = 339.0
+offset_bottom = 642.0
+
+[node name="Control" type="Control" parent="Customizer" unique_id=26350403]
+custom_minimum_size = Vector2(0, 296.44)
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = 940.0
+offset_top = 743.56
+offset_right = 940.0
+offset_bottom = 1040.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+metadata/_edit_group_ = true
+
+[node name="Leg0" type="Area2D" parent="Customizer/Control" unique_id=1677918104 node_paths=PackedStringArray("sprite")]
+script = ExtResource("2_jyy8t")
+sprite = NodePath("Visual")
+
+[node name="Visual" type="Sprite2D" parent="Customizer/Control/Leg0" unique_id=362741004]
+position = Vector2(0, -41)
+texture = ExtResource("2_v2fcp")
+centered = false
+offset = Vector2(0, -256)
+
+[node name="Collision" type="CollisionPolygon2D" parent="Customizer/Control/Leg0" unique_id=1617133811]
+visible = false
+position = Vector2(0, -41)
+polygon = PackedVector2Array(318, -226, 306, -226, 306, -224.3, 299.5, -221, 296.9, -221, 287, -205.6, 287, -204.5, 124, -152.5, 124, -151.6, 121.9, -151, 120.6, -151, 111, -156.3, 111, -158, 100.4, -158, 92.4, -153, 89.8, -153, 81.9, -139, 79.5, -139, 83, -124, 2, -21, 0, -21, 0, 0, 21, 0, 21, -10.300003, 97, -105.3, 97, -106.899994, 99.3, -108.5, 100.7, -108, 109.6, -108, 114.5, -111, 117, -111, 130, -128.3, 130, -129.6, 293.3, -183, 296.4, -183, 306, -177.8, 306, -175.6, 319.4, -178, 320.2, -178, 449.8, -45.399994, 449, -32.100006, 449, -23.399994, 458, -10.5, 458, -8.600006, 468, -4.699997, 468, -2.5, 483, -6, 485.8, -6, 491.8, -12, 493.4, -12, 497.4, -22, 499, -22, 499, -32.600006, 494, -40.699997, 494, -43.100006, 470.6, -59, 466.8, -59, 335.6, -193.2, 337, -196.6, 337, -205.6, 328, -218.6, 328, -220.4, 318, -224.4)
+
+[node name="Leg1" type="Area2D" parent="Customizer/Control" unique_id=44077519 node_paths=PackedStringArray("sprite")]
+script = ExtResource("2_jyy8t")
+sprite = NodePath("Visual")
+
+[node name="Visual" type="Sprite2D" parent="Customizer/Control/Leg1" unique_id=2106593022]
+position = Vector2(0, -41)
+rotation = 3.1415927
+scale = Vector2(1, -1)
+texture = ExtResource("2_v2fcp")
+centered = false
+offset = Vector2(0, -256)
+
+[node name="Collision" type="CollisionPolygon2D" parent="Customizer/Control/Leg1" unique_id=1513263525]
+visible = false
+position = Vector2(0, -41)
+rotation = 3.1415927
+scale = Vector2(1, -1)
+polygon = PackedVector2Array(318, -226, 306, -226, 306, -224.3, 299.5, -221, 296.9, -221, 287, -205.6, 287, -204.5, 124, -152.5, 124, -151.6, 121.9, -151, 120.6, -151, 111, -156.3, 111, -158, 100.4, -158, 92.4, -153, 89.8, -153, 81.9, -139, 79.5, -139, 83, -124, 2, -21, 0, -21, 0, 0, 21, 0, 21, -10.300003, 97, -105.3, 97, -106.899994, 99.3, -108.5, 100.7, -108, 109.6, -108, 114.5, -111, 117, -111, 130, -128.3, 130, -129.6, 293.3, -183, 296.4, -183, 306, -177.8, 306, -175.6, 319.4, -178, 320.2, -178, 449.8, -45.399994, 449, -32.100006, 449, -23.399994, 458, -10.5, 458, -8.600006, 468, -4.699997, 468, -2.5, 483, -6, 485.8, -6, 491.8, -12, 493.4, -12, 497.4, -22, 499, -22, 499, -32.600006, 494, -40.699997, 494, -43.100006, 470.6, -59, 466.8, -59, 335.6, -193.2, 337, -196.6, 337, -205.6, 328, -218.6, 328, -220.4, 318, -224.4)
+
+[node name="Leg2" type="Area2D" parent="Customizer/Control" unique_id=1261912755 node_paths=PackedStringArray("sprite")]
+script = ExtResource("2_jyy8t")
+sprite = NodePath("Visual")
+
+[node name="Visual" type="Sprite2D" parent="Customizer/Control/Leg2" unique_id=1275427962]
+position = Vector2(0, -41)
+rotation = 2.5307274
+scale = Vector2(1, -1)
+texture = ExtResource("2_v2fcp")
+centered = false
+offset = Vector2(0, -256)
+
+[node name="Collision" type="CollisionPolygon2D" parent="Customizer/Control/Leg2" unique_id=1869306498]
+visible = false
+position = Vector2(0, -41)
+rotation = 2.5307274
+scale = Vector2(1, -1)
+polygon = PackedVector2Array(318, -226, 306, -226, 306, -224.3, 299.5, -221, 296.9, -221, 287, -205.6, 287, -204.5, 124, -152.5, 124, -151.6, 121.9, -151, 120.6, -151, 111, -156.3, 111, -158, 100.4, -158, 92.4, -153, 89.8, -153, 81.9, -139, 79.5, -139, 83, -124, 2, -21, 0, -21, 0, 0, 21, 0, 21, -10.300003, 97, -105.3, 97, -106.899994, 99.3, -108.5, 100.7, -108, 109.6, -108, 114.5, -111, 117, -111, 130, -128.3, 130, -129.6, 293.3, -183, 296.4, -183, 306, -177.8, 306, -175.6, 319.4, -178, 320.2, -178, 449.8, -45.399994, 449, -32.100006, 449, -23.399994, 458, -10.5, 458, -8.600006, 468, -4.699997, 468, -2.5, 483, -6, 485.8, -6, 491.8, -12, 493.4, -12, 497.4, -22, 499, -22, 499, -32.600006, 494, -40.699997, 494, -43.100006, 470.6, -59, 466.8, -59, 335.6, -193.2, 337, -196.6, 337, -205.6, 328, -218.6, 328, -220.4, 318, -224.4)
+
+[node name="Leg3" type="Area2D" parent="Customizer/Control" unique_id=878525785 node_paths=PackedStringArray("sprite")]
+script = ExtResource("2_jyy8t")
+sprite = NodePath("Visual")
+
+[node name="Visual" type="Sprite2D" parent="Customizer/Control/Leg3" unique_id=1855935274]
+position = Vector2(0, -41)
+rotation = 0.61086524
+texture = ExtResource("2_v2fcp")
+centered = false
+offset = Vector2(0, -256)
+
+[node name="Collision" type="CollisionPolygon2D" parent="Customizer/Control/Leg3" unique_id=79492718]
+visible = false
+position = Vector2(0, -41)
+rotation = 0.61086524
+polygon = PackedVector2Array(318, -226, 306, -226, 306, -224.3, 299.5, -221, 296.9, -221, 287, -205.6, 287, -204.5, 124, -152.5, 124, -151.6, 121.9, -151, 120.6, -151, 111, -156.3, 111, -158, 100.4, -158, 92.4, -153, 89.8, -153, 81.9, -139, 79.5, -139, 83, -124, 2, -21, 0, -21, 0, 0, 21, 0, 21, -10.300003, 97, -105.3, 97, -106.899994, 99.3, -108.5, 100.7, -108, 109.6, -108, 114.5, -111, 117, -111, 130, -128.3, 130, -129.6, 293.3, -183, 296.4, -183, 306, -177.8, 306, -175.6, 319.4, -178, 320.2, -178, 449.8, -45.399994, 449, -32.100006, 449, -23.399994, 458, -10.5, 458, -8.600006, 468, -4.699997, 468, -2.5, 483, -6, 485.8, -6, 491.8, -12, 493.4, -12, 497.4, -22, 499, -22, 499, -32.600006, 494, -40.699997, 494, -43.100006, 470.6, -59, 466.8, -59, 335.6, -193.2, 337, -196.6, 337, -205.6, 328, -218.6, 328, -220.4, 318, -224.4)
+
+[node name="Head" type="Area2D" parent="Customizer/Control" unique_id=1493044022 node_paths=PackedStringArray("sprite")]
+script = ExtResource("2_jyy8t")
+sprite = NodePath("Visual")
+
+[node name="Visual" type="Sprite2D" parent="Customizer/Control/Head" unique_id=2068219376]
+position = Vector2(0, 1)
+texture = ExtResource("1_d6tbo")
+
+[node name="Collision" type="CollisionPolygon2D" parent="Customizer/Control/Head" unique_id=745508424]
+visible = false
+polygon = PackedVector2Array(-8, -59.2, -8, -57.5, -17.400002, -54, -20.599998, -54, -32.6, -46, -34.9, -46, -48.9, -31, -50.3, -31, -53.3, -24, -54.5, -24, -59, -8.299999, -59, 17.400002, -48, 41.300003, -48, 43.9, -36, 54.9, -36, 56.4, -26, 60.300003, -26, 61.6, -20.2, 63, 4.300003, 63, 13.300003, 60, 17.5, 60, 32.5, 52, 34.9, 52, 44.9, 41, 46.4, 41, 53.4, 20, 55.1, 20, 54, -9.099998, 54, -16.400002, 47, -32.4, 47, -34.8, 32, -49.8, 32, -51.3, 25, -54.3, 25, -55.8)
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="Customizer" unique_id=159971594]
+stream = ExtResource("4_jyy8t")
+volume_db = -26.778
+
+[node name="Button" type="Button" parent="." unique_id=1775525493]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = -41.0
+offset_right = 109.0
+offset_bottom = -10.0
+grow_vertical = 0
+text = "CUSTOMIZE"
