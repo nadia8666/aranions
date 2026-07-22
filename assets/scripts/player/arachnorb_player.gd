@@ -336,6 +336,48 @@ func sync_leg_targets(positions: PackedVector3Array) -> void:
 	for index in range(max_index):
 		leg_targets[index].global_position = positions[index]
 
+# TODO: probably change these to authority instead?
+@rpc("any_peer", "call_local", "reliable")
+func request_leg_color(leg_index: int, color: Color):
+	if not multiplayer.is_server():
+		return
+
+	var sender_id = multiplayer.get_remote_sender_id()
+	if sender_id != get_multiplayer_authority():
+		return
+		
+	if leg_index < 0 or leg_index >= legs.size():
+		return
+		
+	rpc("sync_leg_color", leg_index, color)
+
+@rpc("any_peer", "call_local", "reliable")
+func request_body_color(color: Color):
+	if not multiplayer.is_server():
+		return
+
+	var sender_id = multiplayer.get_remote_sender_id()
+	if sender_id != get_multiplayer_authority():
+		return
+		
+	rpc("sync_body_color", color)
+
+@rpc("any_peer", "call_local", "reliable")
+func sync_leg_color(leg_index: int, color: Color):
+	if leg_index >= 0 and leg_index < legs.size():
+		var leg = legs[leg_index]
+		if leg and leg.mesh:
+			var mat = leg.mesh.get_active_material(0)
+			if mat is BaseMaterial3D:
+				mat.albedo_color = color
+
+@rpc("any_peer", "call_local", "reliable")
+func sync_body_color(color: Color):
+	if body_mesh:
+		var mat = body_mesh.get_active_material(0)
+		if mat is BaseMaterial3D:
+			mat.albedo_color = color
+
 # lifecycle events
 func _ready() -> void:
 	var peer = str(name).to_int()

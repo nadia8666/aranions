@@ -14,20 +14,26 @@ func toggle_ui():
 	ui.visible = not ui.visible
 
 func get_root() -> Node3D:
-	var peer_id = multiplayer.get_unique_id();
-	return NetworkManager.players_container.get_node(str(peer_id))
+	var peer_id = multiplayer.get_unique_id()
+	if NetworkManager.players_container and NetworkManager.players_container.has_node(str(peer_id)):
+		return NetworkManager.players_container.get_node(str(peer_id))
+	return null
 
 func paint_leg(leg: MouseDetectorArea2D, index: int):
 	var root = get_root()
-	root.get_node("Leg %s" % [index]).mesh.get_active_material(0).albedo_color = color_picker.color
-	leg.sprite.modulate = color_picker.color
+	if root:
+		root.rpc_id(1, "request_leg_color", index, color_picker.color)
+		leg.sprite.modulate = color_picker.color
+	
 	get_tree().root.set_input_as_handled()
 	paint_sound.play()
 
 func paint_body():
 	var root = get_root()
-	root.body_mesh.get_active_material(0).albedo_color = color_picker.color
-	head.sprite.modulate = color_picker.color
+	if root:
+		root.rpc_id(1, "request_body_color", color_picker.color)
+		head.sprite.modulate = color_picker.color
+	
 	get_tree().root.set_input_as_handled()
 	paint_sound.play()
 
